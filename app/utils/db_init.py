@@ -31,7 +31,7 @@ def seed_flags():
             'difficulty': 'medium',
             'vulnerability_type': 'A01_Broken_Access_Control',
             'description': 'Access another user\'s profile data by manipulating user IDs. Try <a href="/profile/2">/profile/2</a> to access the test user\'s profile.',
-            'hint': 'Try changing the user_id parameter in the URL. The test user has ID 2.'
+            'hint': None
         },
         # A01:2021 – Broken Access Control (Hard)
         {
@@ -41,7 +41,7 @@ def seed_flags():
             'difficulty': 'hard',
             'vulnerability_type': 'A01_Broken_Access_Control',
             'description': 'Exploit IDOR vulnerability to access sensitive files. Try <a href="/files/1">/files/1</a> and experiment with different file IDs.',
-            'hint': 'File IDs might be predictable. Try accessing /files/1, /files/2, /files/3 to find the secret file.'
+            'hint': None
         },
         
         # A02:2021 – Cryptographic Failures (Easy)
@@ -62,7 +62,7 @@ def seed_flags():
             'difficulty': 'medium',
             'vulnerability_type': 'A02_Cryptographic_Failures',
             'description': 'Decrypt weakly encrypted data using basic cryptanalysis. Visit <a href="/encrypted-data">/encrypted-data</a> to find encrypted data.',
-            'hint': 'ROT13 is not encryption! Use an online ROT13 decoder or Python.'
+            'hint': None
         },
         # A02:2021 – Cryptographic Failures (Hard)
         {
@@ -72,7 +72,7 @@ def seed_flags():
             'difficulty': 'hard',
             'vulnerability_type': 'A02_Cryptographic_Failures',
             'description': 'Exploit weak password hashing to recover credentials. Visit <a href="/user-hashes">/user-hashes</a> to find exposed MD5 hashes.',
-            'hint': 'MD5 is no longer secure for password hashing. Try using online hash crackers like CrackStation.'
+            'hint': None
         },
         
         # A03:2021 – Injection (Easy)
@@ -93,7 +93,7 @@ def seed_flags():
             'difficulty': 'medium',
             'vulnerability_type': 'A03_Injection',
             'description': 'Extract data from the database using UNION-based SQL injection. Visit <a href="/search">/search</a> and use UNION SELECT.',
-            'hint': 'Use UNION SELECT to combine results from different tables. Try: \' UNION SELECT id, name, value FROM flags--'
+            'hint': None
         },
         # A03:2021 – Injection (Hard)
         {
@@ -102,8 +102,8 @@ def seed_flags():
             'points': 300,
             'difficulty': 'hard',
             'vulnerability_type': 'A03_Injection',
-            'description': 'Use blind SQL injection to extract sensitive information. Visit <a href="/check-user">/check-user</a> and exploit the boolean-based blind SQLi.',
-            'hint': 'Time-based or boolean-based blind SQL injection techniques. Try: admin\' AND SUBSTR((SELECT value FROM flags WHERE id=9),1,1)=\'F\'--'
+            'description': 'Use advanced blind SQL injection techniques to extract sensitive information. Visit <a href="/check-user">/check-user</a> and exploit the blind SQLi vulnerability. No direct output or hints provided.',
+            'hint': None
         },
         
         # A05:2021 – Security Misconfiguration (Easy)
@@ -136,7 +136,7 @@ def seed_flags():
             'difficulty': 'medium',
             'vulnerability_type': 'A08_Software_Data_Integrity_Failures',
             'description': 'Manipulate serialized data to gain unauthorized access. Visit <a href="/session-check">/session-check</a> and manipulate URL parameters.',
-            'hint': 'Check cookies and session data. Try adding ?admin=true to the URL.'
+            'hint': None
         },
         
         # A10:2021 – Server-Side Request Forgery (Hard)
@@ -147,7 +147,7 @@ def seed_flags():
             'difficulty': 'hard',
             'vulnerability_type': 'A10_SSRF',
             'description': 'Exploit SSRF to access internal resources. Visit <a href="/fetch-url">/fetch-url</a> and try fetching internal URLs.',
-            'hint': 'Try accessing localhost or internal IP addresses through the URL parameter. Example: http://localhost:5000/admin'
+            'hint': None
         }
     ]
     

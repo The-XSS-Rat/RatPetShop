@@ -186,7 +186,7 @@ def search():
 # Challenge 9: SQL Injection - Hard (Blind SQLi)
 @vulnerable_bp.route('/check-user')
 def check_user():
-    """VULNERABLE: Blind SQL injection."""
+    """VULNERABLE: Blind SQL injection - advanced techniques required."""
     username = request.args.get('username', '')
     
     if username:
@@ -201,13 +201,11 @@ def check_user():
             result = cursor.fetchone()
             conn.close()
             
-            flag = Flag.query.filter_by(name='SQL Injection - Hard').first()
-            
+            # No flag display - must use OOB exfiltration
             if result and result[0] > 0:
                 return render_template('vulnerable/check_user.html', 
                                      exists=True, 
-                                     username=username,
-                                     flag=flag)
+                                     username=username)
             else:
                 return render_template('vulnerable/check_user.html', 
                                      exists=False, 
