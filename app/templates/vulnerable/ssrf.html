@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}URL Fetcher - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🌐 URL Fetcher (SSRF Vulnerability)</h1>
+    
+    <div class="card">
+        <h2>Fetch External URL</h2>
+        <p>This tool fetches content from any URL. Try it out!</p>
+        
+        <form method="GET" class="fetch-form">
+            <div class="form-group">
+                <label>URL to fetch:</label>
+                <input type="text" name="url" value="{{ url }}" placeholder="https://example.com" required>
+                <button type="submit" class="btn">Fetch</button>
+            </div>
+        </form>
+        
+        {% if error %}
+        <div class="alert-error">
+            <p><strong>Error:</strong> {{ error }}</p>
+        </div>
+        {% endif %}
+        
+        {% if content %}
+        <div class="content-box">
+            <h3>Fetched Content:</h3>
+            <pre>{{ content }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <p>You successfully exploited SSRF to access internal resources!</p>
+            <code>{{ flag.value }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> This is vulnerable to <strong>Server-Side Request Forgery (SSRF)</strong>!</p>
+            <p>Try accessing internal resources:</p>
+            <ul>
+                <li><code>http://localhost:5000/admin</code></li>
+                <li><code>http://127.0.0.1:5000/.env</code></li>
+                <li><code>file:///etc/passwd</code> (on Linux systems)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+</div>
+
+<style>
+.fetch-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.fetch-form label {
+    font-weight: bold;
+}
+
+.fetch-form input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.content-box {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.content-box pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.hint ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.hint code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Session Check - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>👤 Session Check</h1>
+    
+    <div class="card">
+        <h2>Admin Access Check</h2>
+        
+        {% if is_admin %}
+        <div class="alert-success">
+            <p><strong>Admin Access Granted!</strong></p>
+            <p>You successfully manipulated the session/parameter to gain admin access!</p>
+        </div>
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.value }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="alert-error">
+            <p>Access Denied. You are not an admin.</p>
+        </div>
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> This page checks for admin status via a URL parameter.</p>
+            <p>Try adding <code>?admin=true</code> to the URL!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.hint code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+</style>
+{% endblock %}

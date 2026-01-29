@@ -20,12 +20,12 @@
 
         <div class="challenge-content">
             <h3>Description</h3>
-            <p>{{ flag.description }}</p>
+            <p>{{ flag.description | safe }}</p>
 
             {% if flag.hint %}
             <details class="hint-section">
                 <summary>💡 Hint</summary>
-                <p>{{ flag.hint }}</p>
+                <p>{{ flag.hint | safe }}</p>
             </details>
             {% endif %}
         </div>
