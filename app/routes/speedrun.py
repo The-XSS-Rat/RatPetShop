@@ -21,10 +21,11 @@ def index():
         is_active=True
     ).first()
     
-    # Get user's completed speedrun sessions
-    completed_sessions = SpeedrunSession.query.filter_by(
-        user_id=session['user_id'],
-        is_active=False
+    # Get user's completed speedrun sessions (exclude cancelled ones)
+    completed_sessions = SpeedrunSession.query.filter(
+        SpeedrunSession.user_id == session['user_id'],
+        SpeedrunSession.is_active == False,
+        SpeedrunSession.elapsed_time.isnot(None)
     ).order_by(SpeedrunSession.elapsed_time.asc()).all()
     
     return render_template('speedrun/index.html',
@@ -45,10 +46,15 @@ def start_speedrun():
     ).first()
     
     if active_session:
-        return jsonify({
-            'success': False,
-            'message': 'You already have an active speedrun session!'
-        }), 400
+        # Cancel the existing active session
+        active_session.is_active = False
+        db.session.commit()
+        
+        # Clean up session data
+        if f'speedrun_{active_session.tenant_id}_flags' in session:
+            session.pop(f'speedrun_{active_session.tenant_id}_flags')
+        if 'active_speedrun_tenant' in session:
+            session.pop('active_speedrun_tenant')
     
     # Validate num_flags parameter
     num_flags = int(request.form.get('num_flags', 5))
@@ -224,6 +230,44 @@ def submit_speedrun_flag():
             'success': False,
             'message': 'Incorrect flag. Try again!'
         })
+
+
+@speedrun_bp.route('/cancel', methods=['POST'])
+def cancel_speedrun():
+    """Cancel an active speedrun session."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Please log in first.'}), 401
+    
+    tenant_id = request.form.get('tenant_id')
+    
+    if not tenant_id:
+        return jsonify({'success': False, 'message': 'Missing tenant ID.'}), 400
+    
+    # Get the active speedrun session
+    speedrun_session = SpeedrunSession.query.filter_by(
+        tenant_id=tenant_id,
+        user_id=session['user_id'],
+        is_active=True
+    ).first()
+    
+    if not speedrun_session:
+        return jsonify({'success': False, 'message': 'No active speedrun session found.'}), 404
+    
+    # Mark session as inactive (cancelled)
+    speedrun_session.is_active = False
+    db.session.commit()
+    
+    # Clean up session data
+    if f'speedrun_{tenant_id}_flags' in session:
+        session.pop(f'speedrun_{tenant_id}_flags')
+    if 'active_speedrun_tenant' in session:
+        session.pop('active_speedrun_tenant')
+    
+    return jsonify({
+        'success': True,
+        'message': 'Speedrun cancelled successfully.',
+        'redirect': url_for('speedrun.index')
+    })
 
 
 @speedrun_bp.route('/leaderboard')
