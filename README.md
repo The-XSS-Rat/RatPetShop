@@ -110,13 +110,17 @@ You can configure the application using environment variables:
 
 - `SECRET_KEY`: Flask secret key (defaults to 'dev-secret-key-change-in-production')
 - `DATABASE_URL`: Database URL (defaults to 'sqlite:///ratpetshop.db')
+- `FLASK_DEBUG`: Set to '0' to disable debug mode (enabled by default for training purposes)
 
 Example:
 ```bash
 export SECRET_KEY="your-secret-key-here"
 export DATABASE_URL="sqlite:///custom.db"
+export FLASK_DEBUG="0"  # Disable debug mode
 python run.py
 ```
+
+**Note**: This application runs in debug mode by default for educational purposes. The debug mode is restricted to localhost (127.0.0.1) only to prevent external access to the Werkzeug debugger.
 
 ## 🎓 Learning Path
 
