@@ -14,6 +14,7 @@
                 <strong>Time:</strong> <span id="timer">{{ elapsed_seconds }}s</span>
             </div>
         </div>
+        <button onclick="cancelSpeedrun()" class="btn btn-danger" style="margin-top: 10px;">Stop & Restart</button>
     </div>
 
     <div class="progress-bar">
@@ -99,6 +100,33 @@ function submitSpeedrunFlag(event, flagId) {
     })
     .catch(error => {
         resultDiv.innerHTML = `<div class="alert alert-error">An error occurred.</div>`;
+    });
+}
+
+function cancelSpeedrun() {
+    if (!confirm('Are you sure you want to stop this speedrun? Your progress will not be saved.')) {
+        return;
+    }
+    
+    fetch('{{ url_for("speedrun.cancel_speedrun") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `tenant_id={{ tenant_id }}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            clearInterval(timerInterval);
+            alert(data.message);
+            window.location.href = data.redirect;
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('An error occurred. Please try again.');
     });
 }
 </script>

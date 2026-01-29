@@ -10,10 +10,12 @@
     {% if active_session %}
     <div class="alert alert-info">
         You have an active speedrun session! <a href="{{ url_for('speedrun.play', tenant_id=active_session.tenant_id) }}">Continue</a>
+        <p style="margin-top: 10px;">Or start a new speedrun below (your current progress will be lost):</p>
     </div>
-    {% else %}
+    {% endif %}
+    
     <div class="speedrun-start">
-        <h2>Start a New Speedrun</h2>
+        <h2>Start a {% if active_session %}New{% else %}{% endif %} Speedrun</h2>
         <form id="speedrun-form" onsubmit="startSpeedrun(event)">
             <div class="form-group">
                 <label for="num_flags">Number of Flags:</label>
@@ -28,7 +30,6 @@
         </form>
         <div id="speedrun-result"></div>
     </div>
-    {% endif %}
 
     {% if completed_sessions %}
     <section class="section">
@@ -66,6 +67,12 @@ function startSpeedrun(event) {
     event.preventDefault();
     const numFlags = document.getElementById('num_flags').value;
     const resultDiv = document.getElementById('speedrun-result');
+    
+    {% if active_session %}
+    if (!confirm('You have an active speedrun session. Starting a new one will cancel the current session. Continue?')) {
+        return;
+    }
+    {% endif %}
     
     fetch('{{ url_for("speedrun.start_speedrun") }}', {
         method: 'POST',
