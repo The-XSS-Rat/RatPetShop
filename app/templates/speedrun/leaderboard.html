@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Speedrun Leaderboard - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>⚡ Speedrun Leaderboard</h1>
+    <p>The fastest speedrun completions!</p>
+
+    <div class="scoreboard">
+        <table class="scoreboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Flags</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in leaderboard_data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.username }}</td>
+                    <td>{{ row.total_flags }}</td>
+                    <td>{{ row.elapsed_time // 60 }}m {{ row.elapsed_time % 60 }}s</td>
+                    <td>{{ row.completed_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ url_for('speedrun.index') }}" class="btn btn-secondary">Back to Speedrun</a>
+</div>
+{% endblock %}

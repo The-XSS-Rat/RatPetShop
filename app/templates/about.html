@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}OWASP Top 10 - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>OWASP Top 10 - 2021</h1>
+    <p>The OWASP Top 10 is a standard awareness document for developers and web application security. It represents a broad consensus about the most critical security risks to web applications.</p>
+
+    <div class="owasp-list">
+        {% for item in owasp_top_10 %}
+        <div class="owasp-item">
+            <h3>{{ item.id }}: {{ item.name }}</h3>
+            <p class="owasp-description">{{ item.description }}</p>
+            <p class="owasp-example"><strong>Examples:</strong> {{ item.example }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>How to Use This Lab</h2>
+        <ol>
+            <li><strong>Register an account</strong> to start tracking your progress</li>
+            <li><strong>Choose a difficulty level</strong> - Easy challenges include detailed guides</li>
+            <li><strong>Read the challenge description</strong> carefully for hints</li>
+            <li><strong>Exploit the vulnerability</strong> to find the flag</li>
+            <li><strong>Submit the flag</strong> to earn points</li>
+            <li><strong>Check the scoreboard</strong> to see how you rank</li>
+        </ol>
+    </div>
+
+    <div class="cta-buttons">
+        <a href="{{ url_for('challenges.index') }}" class="btn btn-primary">View Challenges</a>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Challenges - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🎯 Challenges</h1>
+    <p>Choose a challenge to start. Each challenge represents a different OWASP Top 10 vulnerability.</p>
+
+    <section class="section">
+        <h2 class="difficulty-header easy">🟢 Easy Challenges</h2>
+        <div class="challenges-grid">
+            {% for flag in easy_flags %}
+            <div class="challenge-card {% if flag.id in solved_flag_ids %}solved{% endif %}">
+                <h3>{{ flag.name }}</h3>
+                <p>{{ flag.vulnerability_type.replace('_', ' ') }}</p>
+                <p class="points">{{ flag.points }} points</p>
+                {% if flag.id in solved_flag_ids %}
+                <span class="solved-badge">✓ Solved</span>
+                {% endif %}
+                <a href="{{ url_for('challenges.challenge_detail', flag_id=flag.id) }}" class="btn btn-small">View Challenge</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="difficulty-header medium">🟡 Medium Challenges</h2>
+        <div class="challenges-grid">
+            {% for flag in medium_flags %}
+            <div class="challenge-card {% if flag.id in solved_flag_ids %}solved{% endif %}">
+                <h3>{{ flag.name }}</h3>
+                <p>{{ flag.vulnerability_type.replace('_', ' ') }}</p>
+                <p class="points">{{ flag.points }} points</p>
+                {% if flag.id in solved_flag_ids %}
+                <span class="solved-badge">✓ Solved</span>
+                {% endif %}
+                <a href="{{ url_for('challenges.challenge_detail', flag_id=flag.id) }}" class="btn btn-small">View Challenge</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="difficulty-header hard">🔴 Hard Challenges</h2>
+        <div class="challenges-grid">
+            {% for flag in hard_flags %}
+            <div class="challenge-card {% if flag.id in solved_flag_ids %}solved{% endif %}">
+                <h3>{{ flag.name }}</h3>
+                <p>{{ flag.vulnerability_type.replace('_', ' ') }}</p>
+                <p class="points">{{ flag.points }} points</p>
+                {% if flag.id in solved_flag_ids %}
+                <span class="solved-badge">✓ Solved</span>
+                {% endif %}
+                <a href="{{ url_for('challenges.challenge_detail', flag_id=flag.id) }}" class="btn btn-small">View Challenge</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

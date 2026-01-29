@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Speedrun - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="speedrun-header">
+        <h1>⚡ Speedrun in Progress</h1>
+        <div class="speedrun-stats">
+            <div class="stat">
+                <strong>Flags Found:</strong> {{ speedrun_session.flags_found }} / {{ speedrun_session.total_flags }}
+            </div>
+            <div class="stat">
+                <strong>Time:</strong> <span id="timer">{{ elapsed_seconds }}s</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ (speedrun_session.flags_found / speedrun_session.total_flags * 100) }}%"></div>
+    </div>
+
+    <div class="speedrun-challenges">
+        {% for flag in flags %}
+        <div class="challenge-card {% if flag.id in solved_flag_ids %}solved{% endif %}">
+            <h3>{{ flag.name }}</h3>
+            <p>{{ flag.vulnerability_type.replace('_', ' ') }}</p>
+            <p class="difficulty"><span class="badge badge-{{ flag.difficulty }}">{{ flag.difficulty }}</span></p>
+            
+            {% if flag.id in solved_flag_ids %}
+            <span class="solved-badge">✓ Solved</span>
+            {% else %}
+            <details>
+                <summary>View Challenge</summary>
+                <p>{{ flag.description }}</p>
+                {% if flag.hint %}
+                <details class="hint-section">
+                    <summary>💡 Hint</summary>
+                    <p>{{ flag.hint }}</p>
+                </details>
+                {% endif %}
+                <form class="speedrun-flag-form" onsubmit="submitSpeedrunFlag(event, {{ flag.id }})">
+                    <input type="text" class="flag-input-{{ flag.id }}" placeholder="FLAG{...}" required>
+                    <button type="submit" class="btn btn-small">Submit</button>
+                </form>
+                <div class="result-{{ flag.id }}"></div>
+            </details>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let startTime = {{ elapsed_seconds }};
+let timerInterval;
+
+function updateTimer() {
+    startTime++;
+    const minutes = Math.floor(startTime / 60);
+    const seconds = startTime % 60;
+    document.getElementById('timer').textContent = `${minutes}m ${seconds}s`;
+}
+
+timerInterval = setInterval(updateTimer, 1000);
+
+function submitSpeedrunFlag(event, flagId) {
+    event.preventDefault();
+    const flagValue = document.querySelector(`.flag-input-${flagId}`).value;
+    const resultDiv = document.querySelector(`.result-${flagId}`);
+    
+    fetch('{{ url_for("speedrun.submit_speedrun_flag") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `flag_id=${flagId}&flag_value=${encodeURIComponent(flagValue)}&tenant_id={{ tenant_id }}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            resultDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            if (data.completed) {
+                clearInterval(timerInterval);
+                setTimeout(() => {
+                    alert(`Speedrun completed in ${Math.floor(data.elapsed_time / 60)}m ${data.elapsed_time % 60}s!`);
+                    window.location.href = '{{ url_for("speedrun.index") }}';
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        } else {
+            resultDiv.innerHTML = `<div class="alert alert-error">${data.message}</div>`;
+        }
+    })
+    .catch(error => {
+        resultDiv.innerHTML = `<div class="alert alert-error">An error occurred.</div>`;
+    });
+}
+</script>
+{% endblock %}
