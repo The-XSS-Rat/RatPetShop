@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}'s Stats - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ user.username }}'s Statistics</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>{{ total_points }}</h3>
+            <p>Total Points</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ total_flags }}</h3>
+            <p>Flags Captured</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ easy_count }}</h3>
+            <p>Easy Challenges</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ medium_count }}</h3>
+            <p>Medium Challenges</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ hard_count }}</h3>
+            <p>Hard Challenges</p>
+        </div>
+    </div>
+
+    <h2>Solved Challenges</h2>
+    <table class="submissions-table">
+        <thead>
+            <tr>
+                <th>Challenge</th>
+                <th>Vulnerability Type</th>
+                <th>Difficulty</th>
+                <th>Points</th>
+                <th>Solved At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+            <tr>
+                <td>{{ submission.name }}</td>
+                <td>{{ submission.vulnerability_type.replace('_', ' ') }}</td>
+                <td><span class="badge badge-{{ submission.difficulty }}">{{ submission.difficulty }}</span></td>
+                <td>{{ submission.points_awarded }}</td>
+                <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('scoreboard.index') }}" class="btn btn-secondary">Back to Scoreboard</a>
+</div>
+{% endblock %}

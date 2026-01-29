@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RatPetShop - OWASP Top 10 Lab{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="{{ url_for('main.index') }}">🐀 RatPetShop</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a href="{{ url_for('main.about') }}">OWASP Top 10</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('challenges.index') }}">Challenges</a></li>
+                    <li><a href="{{ url_for('scoreboard.index') }}">Scoreboard</a></li>
+                    <li><a href="{{ url_for('speedrun.index') }}">Speedrun</a></li>
+                    <li><a href="{{ url_for('auth.profile') }}">Profile</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">Logout ({{ session.username }})</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                <div class="container">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 RatPetShop OWASP Lab - Educational Purposes Only</p>
+            <p><strong>Warning:</strong> This application contains intentional security vulnerabilities for educational purposes. Do not use in production!</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>User Profile</h2>
+    
+    <div class="profile-info">
+        <h3>{{ user.username }}</h3>
+        <p>Email: {{ user.email or 'Not provided' }}</p>
+        <p>Member since: {{ user.created_at.strftime('%Y-%m-%d') }}</p>
+        <p>Total Points: <strong>{{ total_points }}</strong></p>
+        <p>Flags Captured: <strong>{{ submissions|length }}</strong></p>
+    </div>
+
+    <h3>Your Solved Challenges</h3>
+    {% if submissions %}
+    <table class="submissions-table">
+        <thead>
+            <tr>
+                <th>Challenge</th>
+                <th>Difficulty</th>
+                <th>Points</th>
+                <th>Solved At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+            <tr>
+                <td>{{ submission.name }}</td>
+                <td><span class="badge badge-{{ submission.difficulty }}">{{ submission.difficulty }}</span></td>
+                <td>{{ submission.points }}</td>
+                <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You haven't solved any challenges yet. <a href="{{ url_for('challenges.index') }}">Start now!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

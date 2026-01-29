@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Speedrun Mode - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>⚡ Speedrun Mode</h1>
+    <p>Test your skills! Find randomly selected flags as fast as possible in a separate tenant.</p>
+
+    {% if active_session %}
+    <div class="alert alert-info">
+        You have an active speedrun session! <a href="{{ url_for('speedrun.play', tenant_id=active_session.tenant_id) }}">Continue</a>
+    </div>
+    {% else %}
+    <div class="speedrun-start">
+        <h2>Start a New Speedrun</h2>
+        <form id="speedrun-form" onsubmit="startSpeedrun(event)">
+            <div class="form-group">
+                <label for="num_flags">Number of Flags:</label>
+                <select id="num_flags" name="num_flags">
+                    <option value="3">3 Flags (Quick)</option>
+                    <option value="5" selected>5 Flags (Normal)</option>
+                    <option value="8">8 Flags (Challenge)</option>
+                    <option value="10">10 Flags (Expert)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Start Speedrun</button>
+        </form>
+        <div id="speedrun-result"></div>
+    </div>
+    {% endif %}
+
+    {% if completed_sessions %}
+    <section class="section">
+        <h2>Your Previous Speedruns</h2>
+        <table class="speedrun-table">
+            <thead>
+                <tr>
+                    <th>Flags</th>
+                    <th>Time</th>
+                    <th>Completed At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in completed_sessions %}
+                <tr>
+                    <td>{{ session.total_flags }}</td>
+                    <td>{{ session.elapsed_time // 60 }}m {{ session.elapsed_time % 60 }}s</td>
+                    <td>{{ session.completed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    {% endif %}
+
+    <div class="cta-buttons">
+        <a href="{{ url_for('speedrun.leaderboard') }}" class="btn btn-secondary">View Leaderboard</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function startSpeedrun(event) {
+    event.preventDefault();
+    const numFlags = document.getElementById('num_flags').value;
+    const resultDiv = document.getElementById('speedrun-result');
+    
+    fetch('{{ url_for("speedrun.start_speedrun") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `num_flags=${numFlags}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            resultDiv.innerHTML = `<div class="alert alert-error">${data.message}</div>`;
+        }
+    })
+    .catch(error => {
+        resultDiv.innerHTML = `<div class="alert alert-error">An error occurred. Please try again.</div>`;
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Help - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Help & Getting Started</h1>
+    
+    <section class="section">
+        <h2>Quick Start Guide</h2>
+        <ol>
+            <li><strong>Create an Account:</strong> Register a new account to start your journey</li>
+            <li><strong>Browse Challenges:</strong> Visit the Challenges page to see all available CTF challenges</li>
+            <li><strong>Select a Challenge:</strong> Start with Easy challenges if you're new to cybersecurity</li>
+            <li><strong>Read the Description:</strong> Each challenge has hints and guidance</li>
+            <li><strong>Find the Flag:</strong> Exploit the vulnerability to discover the flag</li>
+            <li><strong>Submit Your Flag:</strong> Enter the flag in the format FLAG{...} to earn points</li>
+        </ol>
+    </section>
+
+    <section class="section">
+        <h2>Understanding Difficulty Levels</h2>
+        <div class="difficulty-grid">
+            <div class="difficulty-card easy">
+                <h3>🟢 Easy (100 points)</h3>
+                <p>Perfect for beginners. These challenges include:</p>
+                <ul>
+                    <li>Detailed step-by-step guidance</li>
+                    <li>Clear hints in the description</li>
+                    <li>Basic exploitation techniques</li>
+                    <li>Educational explanations</li>
+                </ul>
+            </div>
+            <div class="difficulty-card medium">
+                <h3>🟡 Medium (200 points)</h3>
+                <p>For intermediate users. These challenges feature:</p>
+                <ul>
+                    <li>Less direct guidance</li>
+                    <li>More complex scenarios</li>
+                    <li>Require creative thinking</li>
+                    <li>Application of learned concepts</li>
+                </ul>
+            </div>
+            <div class="difficulty-card hard">
+                <h3>🔴 Hard (300 points)</h3>
+                <p>For experienced security practitioners. Expect:</p>
+                <ul>
+                    <li>Advanced exploitation techniques</li>
+                    <li>Minimal hints</li>
+                    <li>Complex vulnerability chains</li>
+                    <li>Deep security knowledge required</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Speedrun Mode</h2>
+        <p>Speedrun mode is a competitive feature where you race against time:</p>
+        <ul>
+            <li>Select how many flags you want to find (3, 5, 8, or 10)</li>
+            <li>Get a random set of challenges in a separate tenant</li>
+            <li>Timer starts immediately</li>
+            <li>Complete all flags as fast as possible</li>
+            <li>Compete on the speedrun leaderboard</li>
+        </ul>
+    </section>
+
+    <section class="section">
+        <h2>Flag Format</h2>
+        <p>All flags in this lab follow the format:</p>
+        <pre>FLAG{some_unique_identifier_here}</pre>
+        <p>Make sure to submit the complete flag including the curly braces.</p>
+    </section>
+
+    <section class="section">
+        <h2>Tips for Success</h2>
+        <ul>
+            <li><strong>Read Carefully:</strong> Challenge descriptions often contain important hints</li>
+            <li><strong>Use Browser DevTools:</strong> Inspect network requests, cookies, and page source</li>
+            <li><strong>Think Like an Attacker:</strong> Consider what an attacker would try</li>
+            <li><strong>Learn from OWASP:</strong> Visit the OWASP Top 10 page for detailed explanations</li>
+            <li><strong>Practice Safely:</strong> Only use these techniques in this controlled lab environment</li>
+        </ul>
+    </section>
+
+    <section class="section warning-section">
+        <h2>⚠️ Important Reminders</h2>
+        <p>This application is designed for educational purposes only:</p>
+        <ul>
+            <li>Never use these techniques on real systems without permission</li>
+            <li>Unauthorized access to computer systems is illegal</li>
+            <li>Always practice ethical hacking principles</li>
+            <li>Use this knowledge to build more secure applications</li>
+        </ul>
+    </section>
+
+    <div class="cta-buttons">
+        <a href="{{ url_for('challenges.index') }}" class="btn btn-primary">Start Challenges</a>
+        <a href="{{ url_for('main.about') }}" class="btn btn-secondary">Learn About OWASP Top 10</a>
+    </div>
+</div>
+{% endblock %}

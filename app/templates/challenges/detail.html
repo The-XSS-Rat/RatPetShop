@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ flag.name }} - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="challenge-detail">
+        <h1>{{ flag.name }}</h1>
+        <div class="challenge-meta">
+            <span class="badge badge-{{ flag.difficulty }}">{{ flag.difficulty }}</span>
+            <span class="badge">{{ flag.vulnerability_type.replace('_', ' ') }}</span>
+            <span class="points">{{ flag.points }} points</span>
+        </div>
+
+        {% if solved %}
+        <div class="alert alert-success">
+            ✓ You have already solved this challenge!
+        </div>
+        {% endif %}
+
+        <div class="challenge-content">
+            <h3>Description</h3>
+            <p>{{ flag.description }}</p>
+
+            {% if flag.hint %}
+            <details class="hint-section">
+                <summary>💡 Hint</summary>
+                <p>{{ flag.hint }}</p>
+            </details>
+            {% endif %}
+        </div>
+
+        {% if not solved %}
+        <div class="flag-submission">
+            <h3>Submit Flag</h3>
+            <form id="flag-form" onsubmit="submitFlag(event, {{ flag.id }})">
+                <input type="text" id="flag-input" placeholder="FLAG{...}" required>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <div id="submission-result"></div>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function submitFlag(event, flagId) {
+    event.preventDefault();
+    const flagValue = document.getElementById('flag-input').value;
+    const resultDiv = document.getElementById('submission-result');
+    
+    fetch('{{ url_for("challenges.submit_flag") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `flag_id=${flagId}&flag_value=${encodeURIComponent(flagValue)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            resultDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            if (data.points) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        } else {
+            resultDiv.innerHTML = `<div class="alert alert-error">${data.message}</div>`;
+        }
+    })
+    .catch(error => {
+        resultDiv.innerHTML = `<div class="alert alert-error">An error occurred. Please try again.</div>`;
+    });
+}
+</script>
+{% endblock %}

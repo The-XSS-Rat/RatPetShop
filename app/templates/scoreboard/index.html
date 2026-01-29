@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Scoreboard - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🏆 Scoreboard</h1>
+    <p>See how you rank against other players!</p>
+
+    {% if user_rank %}
+    <div class="user-rank-card">
+        <h3>Your Rank: #{{ user_rank }}</h3>
+        <p>Total Points: {{ user_points }}</p>
+    </div>
+    {% endif %}
+
+    <div class="scoreboard">
+        <table class="scoreboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Flags Solved</th>
+                    <th>Total Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in scoreboard_data %}
+                <tr {% if session.user_id == row.id %}class="current-user"{% endif %}>
+                    <td>{{ loop.index }}</td>
+                    <td><a href="{{ url_for('scoreboard.user_stats', user_id=row.id) }}">{{ row.username }}</a></td>
+                    <td>{{ row.flags_solved }}</td>
+                    <td>{{ row.total_points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
