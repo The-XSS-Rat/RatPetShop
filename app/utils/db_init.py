@@ -102,7 +102,7 @@ def seed_flags():
             'points': 300,
             'difficulty': 'hard',
             'vulnerability_type': 'A03_Injection',
-            'description': 'Use blind SQL injection to extract sensitive information via out-of-band (OOB) exfiltration. Visit <a href="/check-user">/check-user</a> and exploit the blind SQLi vulnerability.',
+            'description': 'Use advanced blind SQL injection techniques to extract sensitive information. Visit <a href="/check-user">/check-user</a> and exploit the blind SQLi vulnerability. No direct output or hints provided.',
             'hint': None
         },
         
