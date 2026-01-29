@@ -1,11 +1,17 @@
 """Vulnerable routes for challenges - INTENTIONALLY INSECURE!"""
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Blueprint, render_template, request
 from app.models import db, User, Flag
 import sqlite3
 import os
 import hashlib
+import urllib.request
 
 vulnerable_bp = Blueprint('vulnerable', __name__)
+
+
+def get_db_path():
+    """Helper function to get the database path."""
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'instance', 'ratpetshop.db')
 
 
 # Challenge 1: Broken Access Control - Easy (Admin Panel)
@@ -77,13 +83,12 @@ def encrypted_data():
     flag = Flag.query.filter_by(name='Cryptographic Failures - Medium').first()
     
     # ROT13 "encryption"
-    if flag:
+    encrypted = "ERROR"
+    if flag and flag.value:
         encrypted = flag.value.translate(str.maketrans(
             'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
             'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
         ))
-    else:
-        encrypted = "ERROR"
     
     return render_template('vulnerable/encrypted.html', encrypted=encrypted)
 
@@ -116,8 +121,7 @@ def vuln_login():
         
         # INTENTIONALLY VULNERABLE SQL QUERY
         # DO NOT USE THIS IN REAL APPLICATIONS!
-        db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'instance', 'ratpetshop.db')
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
         
         # Vulnerable query - directly concatenating user input
@@ -153,8 +157,7 @@ def search():
     query = request.args.get('q', '')
     
     if query:
-        db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'instance', 'ratpetshop.db')
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
         
         # Vulnerable query
@@ -187,8 +190,7 @@ def check_user():
     username = request.args.get('username', '')
     
     if username:
-        db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'instance', 'ratpetshop.db')
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
         
         # Vulnerable query for blind SQLi
@@ -287,9 +289,8 @@ def fetch_url():
     
     if url:
         try:
-            import urllib.request
-            
             # Vulnerable - no URL validation!
+            # WARNING: SSRF vulnerability - allows access to internal resources
             with urllib.request.urlopen(url, timeout=5) as response:
                 content = response.read().decode('utf-8')[:1000]  # Limit output
                 
@@ -301,18 +302,3 @@ def fetch_url():
             error = str(e)
     
     return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
-
-
-# Helper route to create test user for IDOR challenge
-@vulnerable_bp.route('/create-test-user')
-def create_test_user():
-    """Create a test user for IDOR challenge."""
-    # Check if test user exists
-    test_user = User.query.filter_by(username='testuser').first()
-    if not test_user:
-        test_user = User(username='testuser', email='test@example.com')
-        test_user.set_password('testpass123')
-        db.session.add(test_user)
-        db.session.commit()
-        return f"Test user created with ID: {test_user.id}"
-    return f"Test user already exists with ID: {test_user.id}"

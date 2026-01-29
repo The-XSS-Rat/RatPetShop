@@ -179,7 +179,7 @@ def seed_test_user():
         db.session.commit()
         print("Test user created (username: testuser, password: testpass123)")
     else:
-        print(f"Test user already exists")
+        print(f"Test user already exists (username: testuser)")
 
 
 def seed_admin_user():
