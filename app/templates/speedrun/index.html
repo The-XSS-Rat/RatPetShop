@@ -15,7 +15,7 @@
     {% endif %}
     
     <div class="speedrun-start">
-        <h2>Start a {% if active_session %}New{% else %}{% endif %} Speedrun</h2>
+        <h2>{% if active_session %}Start a New Speedrun{% else %}Start a Speedrun{% endif %}</h2>
         <form id="speedrun-form" onsubmit="startSpeedrun(event)">
             <div class="form-group">
                 <label for="num_flags">Number of Flags:</label>
