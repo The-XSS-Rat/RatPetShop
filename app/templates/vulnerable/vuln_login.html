@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Vulnerable Login - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔓 Vulnerable Login</h1>
+    
+    {% if success %}
+    <div class="alert-success">
+        <h2>{{ message }}</h2>
+        <p>You successfully bypassed the login using SQL injection!</p>
+    </div>
+    
+    {% if flag %}
+    <div class="flag-box">
+        <h3>🏁 Flag Found!</h3>
+        <code>{{ flag.value }}</code>
+        <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+    </div>
+    {% endif %}
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+    {% else %}
+    
+    <div class="card">
+        <h2>Login Form</h2>
+        <p>This login form is vulnerable to SQL injection. Can you bypass it?</p>
+        
+        {% if error %}
+        <div class="alert-error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" class="login-form">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="text" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn">Login</button>
+        </form>
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> Try using SQL injection in the username field!</p>
+            <p>Example: <code>admin' OR '1'='1</code></p>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+    {% endif %}
+</div>
+
+<style>
+.login-form {
+    max-width: 400px;
+    margin: 1rem 0;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.hint code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}

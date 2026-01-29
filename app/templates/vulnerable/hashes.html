@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}User Hashes - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔓 User Password Hashes</h1>
+    
+    <div class="alert-warning">
+        <strong>Warning:</strong> This page exposes password hashes! This is a security vulnerability!
+    </div>
+    
+    <div class="card">
+        <h2>Leaked Password Hashes (MD5)</h2>
+        <p>Someone left the password hashes exposed. These are MD5 hashes - can you crack them?</p>
+        
+        <table class="hash-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>MD5 Hash</th>
+                    <th>Hint</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td><code>{{ user.hash }}</code></td>
+                    <td>{{ user.hint }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <p class="hint">Try cracking these MD5 hashes using online tools like CrackStation, or rainbow tables!</p>
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag (Visible when you understand the vulnerability)</h3>
+            <code>{{ flag.value }}</code>
+            <p>Submit this flag to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+.alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.hash-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.hash-table th,
+.hash-table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.hash-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.hash-table code {
+    background-color: #e9ecef;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.hint {
+    color: #666;
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Search - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔍 Search Flags</h1>
+    
+    <div class="card">
+        <h2>Flag Search</h2>
+        <p>Search for flags by name. This search is vulnerable to SQL injection!</p>
+        
+        <form method="GET" class="search-form">
+            <div class="form-group">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search flags..." required>
+                <button type="submit" class="btn">Search</button>
+            </div>
+        </form>
+        
+        {% if error %}
+        <div class="alert-error">
+            <p><strong>SQL Error:</strong></p>
+            <pre>{{ error }}</pre>
+            <p>Looks like your input caused a SQL error! This is a UNION-based SQL injection vulnerability.</p>
+        </div>
+        {% endif %}
+        
+        {% if results %}
+        <div class="results">
+            <h3>Search Results:</h3>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result[0] }}</td>
+                        <td>{{ result[1] }}</td>
+                        <td>{{ result[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> Try using UNION SELECT to extract data from other tables!</p>
+            <p>Example: <code>' UNION SELECT id, name, value FROM flags--</code></p>
+            <p>The flag value is in the 'value' column of the 'flags' table.</p>
+        </div>
+        
+        {% if flag %}
+        <div class="info-box">
+            <p><strong>Challenge Flag:</strong></p>
+            <p>Once you successfully extract the flag value using UNION-based SQL injection, look for: <code>{{ flag.name }}</code></p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+</div>
+
+<style>
+.search-form .form-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.alert-error pre {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.5rem;
+    border-radius: 3px;
+    overflow-x: auto;
+}
+
+.results {
+    margin: 1rem 0;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+.results-table th,
+.results-table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.results-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.hint code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.info-box {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.info-box code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}

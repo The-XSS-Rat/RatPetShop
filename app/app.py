@@ -1,7 +1,7 @@
 """Main Flask application."""
 from flask import Flask
 from app.models import db
-from app.routes import main_bp, auth_bp, challenges_bp, scoreboard_bp, speedrun_bp
+from app.routes import main_bp, auth_bp, challenges_bp, scoreboard_bp, speedrun_bp, vulnerable_bp
 from app.utils.db_init import init_db, seed_database
 import os
 
@@ -28,6 +28,7 @@ def create_app(config=None):
     app.register_blueprint(challenges_bp, url_prefix='/challenges')
     app.register_blueprint(scoreboard_bp, url_prefix='/scoreboard')
     app.register_blueprint(speedrun_bp, url_prefix='/speedrun')
+    app.register_blueprint(vulnerable_bp)  # No prefix - various vulnerable endpoints
     
     # Initialize database
     init_db(app)

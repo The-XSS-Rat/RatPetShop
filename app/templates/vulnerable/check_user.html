@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Check User - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔍 Check if Username Exists</h1>
+    
+    <div class="card">
+        <h2>Username Checker</h2>
+        <p>This tool checks if a username exists in the database. It's vulnerable to blind SQL injection!</p>
+        
+        <form method="GET" class="check-form">
+            <div class="form-group">
+                <label>Username to check:</label>
+                <input type="text" name="username" value="{{ username }}" placeholder="Enter username..." required>
+                <button type="submit" class="btn">Check</button>
+            </div>
+        </form>
+        
+        {% if error %}
+        <div class="alert-error">
+            <p><strong>Error:</strong> {{ error }}</p>
+        </div>
+        {% endif %}
+        
+        {% if username %}
+            {% if exists %}
+            <div class="result-exists">
+                <p>✓ Username "{{ username }}" exists in the database!</p>
+            </div>
+            {% else %}
+            <div class="result-not-exists">
+                <p>✗ Username "{{ username }}" does not exist in the database.</p>
+            </div>
+            {% endif %}
+        {% endif %}
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> This is vulnerable to <strong>Blind SQL Injection</strong>!</p>
+            <p>Try boolean-based blind SQLi to extract data one character at a time.</p>
+            <p>Examples:</p>
+            <ul>
+                <li><code>admin' AND '1'='1</code> - Returns true if username exists</li>
+                <li><code>admin' AND '1'='2</code> - Returns false</li>
+                <li><code>admin' AND SUBSTR((SELECT value FROM flags WHERE id=9),1,1)='F'--</code></li>
+            </ul>
+        </div>
+        
+        {% if flag %}
+        <div class="info-box">
+            <p><strong>Challenge Info:</strong></p>
+            <p>The flag for this challenge (ID=9) is in the 'flags' table. Use blind SQLi to extract it character by character!</p>
+            <p>You can verify your extraction by submitting: <code>{{ flag.name }}</code></p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+</div>
+
+<style>
+.check-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.check-form label {
+    font-weight: bold;
+}
+
+.check-form input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.result-exists {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.result-not-exists {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.hint ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.hint code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 0.25rem 0;
+}
+
+.info-box {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.info-box code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}
