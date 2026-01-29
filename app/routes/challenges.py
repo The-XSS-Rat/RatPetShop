@@ -18,11 +18,11 @@ def index():
     medium_flags = Flag.query.filter_by(difficulty='medium').all()
     hard_flags = Flag.query.filter_by(difficulty='hard').all()
     
-    # Get user's solved flags
-    solved_flag_ids = [s.flag_id for s in Submission.query.filter_by(
-        user_id=session['user_id'],
-        is_correct=True
-    ).all()]
+        # Get user's submissions
+        solved_flag_ids = [s.flag_id for s in Submission.query.filter_by(
+            user_id=session['user_id'],
+            is_correct=True
+        ).all()]
     
     return render_template('challenges/index.html',
                          easy_flags=easy_flags,

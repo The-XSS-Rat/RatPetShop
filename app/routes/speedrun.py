@@ -50,13 +50,26 @@ def start_speedrun():
             'message': 'You already have an active speedrun session!'
         }), 400
     
+    # Validate num_flags parameter
+    num_flags = int(request.form.get('num_flags', 5))
+    if num_flags < 1 or num_flags > 13:
+        return jsonify({
+            'success': False,
+            'message': 'Number of flags must be between 1 and 13.'
+        }), 400
+    
     # Generate unique tenant ID for this speedrun
     tenant_id = f"speedrun_{secrets.token_hex(16)}"
     
-    # Select random flags for this speedrun (e.g., 5 random flags)
-    num_flags = int(request.form.get('num_flags', 5))
+    # Select random flags for this speedrun
     all_flags = Flag.query.all()
-    selected_flags = random.sample(all_flags, min(num_flags, len(all_flags)))
+    if len(all_flags) < num_flags:
+        return jsonify({
+            'success': False,
+            'message': 'Not enough flags available.'
+        }), 400
+    
+    selected_flags = random.sample(all_flags, num_flags)
     
     # Create speedrun session
     speedrun_session = SpeedrunSession(
