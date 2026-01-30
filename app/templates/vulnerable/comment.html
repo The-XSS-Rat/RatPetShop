@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Comments - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>💬 User Comments</h1>
+    
+    <div class="card">
+        <h2>Post a Comment</h2>
+        <p>Share your thoughts! This comment system is vulnerable to XSS attacks.</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="comment">Your Comment:</label>
+                <textarea id="comment" name="comment" rows="4" placeholder="Enter your comment..." required></textarea>
+            </div>
+            <button type="submit" class="btn">Post Comment</button>
+        </form>
+        
+        {% if flag %}
+        <div class="info">
+            <p><strong>Challenge:</strong> Inject JavaScript to display the flag below.</p>
+            <p>Flag is stored in: <code>window.flagData</code></p>
+        </div>
+        {% endif %}
+        
+        <div class="comments-section">
+            <h3>Comments:</h3>
+            {% if comments %}
+                {% for comment in comments %}
+                <div class="comment">
+                    {{ comment }}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No comments yet. Be the first to comment!</p>
+            {% endif %}
+        </div>
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> Try injecting <code>&lt;script&gt;alert(window.flagData)&lt;/script&gt;</code> in your comment!</p>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+</div>
+
+<script>
+// Store flag in JavaScript - vulnerable to XSS extraction
+{% if flag %}
+window.flagData = "{{ flag.secret.value if flag.secret else 'ERROR' }}";
+{% endif %}
+</script>
+
+<style>
+.form-group {
+    margin: 1rem 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.comments-section {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.comment {
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background-color: white;
+    border-left: 3px solid #667eea;
+    border-radius: 4px;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.hint code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.info code {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}

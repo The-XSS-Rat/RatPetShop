@@ -1,5 +1,5 @@
 """Vulnerable routes for challenges - INTENTIONALLY INSECURE!"""
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session
 from app.models import db, User, Flag
 import sqlite3
 import os
@@ -300,3 +300,134 @@ def fetch_url():
             error = str(e)
     
     return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+
+
+# Challenge 14: Insecure Design - Medium (Password Reset)
+@vulnerable_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    """VULNERABLE: Insecure password reset with predictable tokens."""
+    if request.method == 'POST':
+        username = request.form.get('username', '')
+        
+        # Vulnerable - predictable reset token based on username
+        if username:
+            import hashlib
+            # INSECURE: Token is just MD5 of username - predictable!
+            reset_token = hashlib.md5(username.encode()).hexdigest()
+            
+            flag = None
+            # If they figured out the token generation, show flag
+            provided_token = request.form.get('token', '')
+            if provided_token == reset_token:
+                flag = Flag.query.filter_by(name='Insecure Design - Medium').first()
+                return render_template('vulnerable/reset_password.html', 
+                                     success=True, 
+                                     flag=flag,
+                                     token=reset_token)
+            
+            return render_template('vulnerable/reset_password.html', 
+                                 token_generated=True,
+                                 username=username,
+                                 token=reset_token)
+    
+    return render_template('vulnerable/reset_password.html')
+
+
+# Challenge 15: Vulnerable Components - Easy
+@vulnerable_bp.route('/dependencies')
+def dependencies():
+    """VULNERABLE: Exposes information about outdated/vulnerable dependencies."""
+    flag = Flag.query.filter_by(name='Outdated Components - Easy').first()
+    
+    # Simulate outdated dependencies with known vulnerabilities
+    deps = [
+        {'name': 'requests', 'version': '2.6.0', 'vulnerability': 'CVE-2018-18074'},
+        {'name': 'flask', 'version': '0.12.0', 'vulnerability': 'CVE-2019-1010083'},
+        {'name': 'werkzeug', 'version': '0.11.0', 'vulnerability': 'Multiple'},
+    ]
+    
+    return render_template('vulnerable/dependencies.html', dependencies=deps, flag=flag)
+
+
+# Challenge 16: Logging Failures - Medium
+@vulnerable_bp.route('/sensitive-action', methods=['GET', 'POST'])
+def sensitive_action():
+    """VULNERABLE: Performs sensitive actions without proper logging."""
+    flag = None
+    
+    if request.method == 'POST':
+        action = request.form.get('action', '')
+        
+        # VULNERABLE: No logging of sensitive actions!
+        # In a real app, this would be a security issue
+        if action == 'delete_all_data':
+            # Simulate a dangerous action with no logging
+            flag = Flag.query.filter_by(name='Logging Failures - Medium').first()
+            return render_template('vulnerable/logging.html', 
+                                 action_performed=True,
+                                 flag=flag)
+    
+    return render_template('vulnerable/logging.html')
+
+
+# Challenge 17: XSS - Medium
+@vulnerable_bp.route('/comment', methods=['GET', 'POST'])
+def comment():
+    """VULNERABLE: Stored XSS in comments."""
+    from flask import Markup
+    
+    flag = Flag.query.filter_by(name='XSS - Medium').first()
+    
+    # Store comments in session for demo (in real app would be DB)
+    if 'comments' not in session:
+        session['comments'] = []
+    
+    if request.method == 'POST':
+        comment_text = request.form.get('comment', '')
+        if comment_text:
+            # VULNERABLE: No sanitization!
+            session['comments'].append(comment_text)
+            session.modified = True
+    
+    # Render comments without escaping - VULNERABLE!
+    comments_html = []
+    for comment in session.get('comments', []):
+        comments_html.append(Markup(comment))
+    
+    return render_template('vulnerable/comment.html', 
+                         comments=comments_html, 
+                         flag=flag)
+
+
+# Challenge 18: Path Traversal - Hard
+@vulnerable_bp.route('/download')
+def download():
+    """VULNERABLE: Path traversal in file download."""
+    filename = request.args.get('file', 'public.txt')
+    
+    flag = None
+    error = None
+    content = None
+    
+    try:
+        # VULNERABLE: No path validation!
+        # This allows path traversal like: ../../../etc/passwd
+        file_path = os.path.join('data', filename)
+        
+        # For demo purposes, simulate file system
+        if '../' in filename or filename == 'secret.txt':
+            flag = Flag.query.filter_by(name='Path Traversal - Hard').first()
+            content = "This is a secret file!\n\nYou successfully exploited path traversal!"
+        elif filename == 'public.txt':
+            content = "This is a public file that anyone can access."
+        else:
+            error = "File not found"
+    
+    except Exception as e:
+        error = str(e)
+    
+    return render_template('vulnerable/download.html', 
+                         filename=filename, 
+                         content=content, 
+                         error=error, 
+                         flag=flag)

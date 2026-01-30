@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Dependencies - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📦 Application Dependencies</h1>
+    
+    <div class="card">
+        <h2>Installed Packages</h2>
+        <p>This page shows the application's dependencies and their versions.</p>
+        
+        <table class="deps-table">
+            <thead>
+                <tr>
+                    <th>Package</th>
+                    <th>Version</th>
+                    <th>Known Vulnerability</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dep in dependencies %}
+                <tr>
+                    <td>{{ dep.name }}</td>
+                    <td>{{ dep.version }}</td>
+                    <td class="vuln">{{ dep.vulnerability }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>You identified that this application uses vulnerable and outdated components!</p>
+        </div>
+        {% endif %}
+        
+        <div class="info">
+            <p><strong>Security Risk:</strong> Using outdated dependencies with known vulnerabilities can lead to system compromise.</p>
+            <p>Always keep your dependencies up to date and monitor for security advisories!</p>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+</div>
+
+<style>
+.deps-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.deps-table th,
+.deps-table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.deps-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.deps-table .vuln {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+
+.info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}

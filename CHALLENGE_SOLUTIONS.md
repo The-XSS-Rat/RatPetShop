@@ -1,6 +1,6 @@
 # RatPetShop Challenge Solutions Guide
 
-This guide provides hints and solutions for all 13 challenges in RatPetShop. This is an educational tool - use it to learn!
+This guide provides hints and solutions for all 18 challenges in RatPetShop. This is an educational tool - use it to learn!
 
 ## ⚠️ Spoiler Warning
 This document contains solutions to all challenges. Try solving them yourself first!
@@ -173,6 +173,73 @@ This document contains solutions to all challenges. Try solving them yourself fi
 4. The flag is displayed after accessing localhost
 
 **Learning**: Always validate and sanitize URLs. Implement allow-lists for external resources.
+
+---
+
+### Challenge 14: Insecure Design - Medium
+**Objective**: Exploit business logic flaw in password reset.
+
+**Solution**:
+1. Visit `/reset-password`
+2. Enter username "admin"
+3. Note the reset token generated
+4. Analyze the token - it's the MD5 hash of the username
+5. Generate token for any user: `echo -n "admin" | md5sum`
+6. Enter the predicted token to get the flag
+
+**Learning**: Password reset tokens must be cryptographically secure and unpredictable.
+
+---
+
+### Challenge 15: Outdated Components - Easy
+**Objective**: Identify vulnerable dependencies.
+
+**Solution**:
+1. Visit `/dependencies`
+2. Review the list of outdated packages with known CVEs
+3. The flag is displayed on the page
+4. Submit the flag
+
+**Learning**: Always keep dependencies updated and use tools like Dependabot or Snyk.
+
+---
+
+### Challenge 16: Logging Failures - Medium
+**Objective**: Exploit insufficient logging.
+
+**Solution**:
+1. Visit `/sensitive-action`
+2. Select "Delete All Data" action
+3. Notice the action executes without any logging
+4. The flag is displayed after performing the action
+
+**Learning**: Critical actions must be logged for security monitoring and forensics.
+
+---
+
+### Challenge 17: XSS - Medium
+**Objective**: Exploit Cross-Site Scripting vulnerability.
+
+**Solution**:
+1. Visit `/comment`
+2. Post a comment with XSS payload: `<script>alert(window.flagData)</script>`
+3. The flag is stored in JavaScript and can be extracted via XSS
+4. Copy the flag from the alert and submit it
+
+**Learning**: Always sanitize user input and use Content Security Policy headers.
+
+---
+
+### Challenge 18: Path Traversal - Hard
+**Objective**: Exploit path traversal to access restricted files.
+
+**Solution**:
+1. Visit `/download`
+2. Try parameter: `?file=../secret.txt` or `?file=secret.txt`
+3. The application doesn't validate file paths
+4. Access the secret file to get the flag
+
+**Learning**: Always validate and sanitize file paths. Use whitelists for allowed files.
 
 ---
 
