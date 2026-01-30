@@ -63,7 +63,7 @@ def file_access(file_id):
     flag = None
     if file_id == 3:
         flag = Flag.query.filter_by(name='Broken Access Control - Hard').first()
-        file['content'] = f"{file['content']}\n\nFlag: {flag.value if flag else 'ERROR'}"
+        file['content'] = f"{file['content']}\n\nFlag: {flag.secret.value if (flag and flag.secret) else 'ERROR'}"
     
     return render_template('vulnerable/file.html', file=file, file_id=file_id)
 
@@ -84,8 +84,8 @@ def encrypted_data():
     
     # ROT13 "encryption"
     encrypted = "ERROR"
-    if flag and flag.value:
-        encrypted = flag.value.translate(str.maketrans(
+    if flag and flag.secret:
+        encrypted = flag.secret.value.translate(str.maketrans(
             'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
             'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
         ))
@@ -232,7 +232,7 @@ DATABASE_URL=sqlite:///ratpetshop.db
 ADMIN_PASSWORD=admin123
 
 # Flag for this challenge:
-FLAG={flag.value if flag else 'ERROR'}
+FLAG={flag.secret.value if (flag and flag.secret) else 'ERROR'}
 """
     
     return env_content, 200, {'Content-Type': 'text/plain'}

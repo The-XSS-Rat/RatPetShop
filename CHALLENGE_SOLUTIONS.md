@@ -101,11 +101,11 @@ This document contains solutions to all challenges. Try solving them yourself fi
 
 **Solution**:
 1. Visit `/search`
-2. Try query: `' UNION SELECT id, name, value FROM flags--`
+2. Try query: `' UNION SELECT fs.id, f.name, fs.value FROM flags f JOIN flag_secrets fs ON f.id = fs.flag_id--`
 3. Look through the results to find flag values
 4. Submit the flag for Challenge 8
 
-**Learning**: SQL injection can be used to extract entire databases. Always use parameterized queries.
+**Learning**: SQL injection can be used to extract entire databases. Always use parameterized queries. Note: Flag values are now stored in a separate table to make this challenge more realistic.
 
 ---
 

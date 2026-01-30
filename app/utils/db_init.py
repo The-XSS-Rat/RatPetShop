@@ -1,5 +1,5 @@
 """Database initialization and seeding utilities."""
-from app.models import db, User, Flag
+from app.models import db, User, Flag, FlagSecret
 import secrets
 
 
@@ -152,14 +152,28 @@ def seed_flags():
     ]
     
     for flag_data in flags_data:
+        flag_value = flag_data.pop('value')  # Remove value from flag_data
+        
         existing = Flag.query.filter_by(name=flag_data['name']).first()
         if not existing:
             flag = Flag(**flag_data)
             db.session.add(flag)
+            db.session.flush()  # Get the flag ID
+            
+            # Create the secret entry
+            secret = FlagSecret(flag_id=flag.id, value=flag_value)
+            db.session.add(secret)
         else:
             # Update existing flags with new descriptions
             existing.description = flag_data['description']
             existing.hint = flag_data['hint']
+            
+            # Update or create secret
+            if not existing.secret:
+                secret = FlagSecret(flag_id=existing.id, value=flag_value)
+                db.session.add(secret)
+            else:
+                existing.secret.value = flag_value
     
     db.session.commit()
     print(f"Seeded {len(flags_data)} flags successfully!")

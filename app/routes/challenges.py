@@ -83,7 +83,7 @@ def submit_flag():
         }), 400
     
     # Validate flag
-    is_correct = submitted_value == flag.value
+    is_correct = submitted_value == flag.secret.value if flag.secret else False
     points_awarded = flag.points if is_correct else 0
     
     # Create submission
