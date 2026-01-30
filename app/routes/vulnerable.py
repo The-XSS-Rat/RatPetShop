@@ -374,7 +374,10 @@ def sensitive_action():
 @vulnerable_bp.route('/comment', methods=['GET', 'POST'])
 def comment():
     """VULNERABLE: Stored XSS in comments."""
-    from flask import Markup
+    try:
+        from markupsafe import Markup
+    except ImportError:
+        from flask import Markup
     
     flag = Flag.query.filter_by(name='XSS - Medium').first()
     
