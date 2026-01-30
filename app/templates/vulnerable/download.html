@@ -1,21 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}URL Fetcher - RatPetShop{% endblock %}
+{% block title %}File Download - RatPetShop{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>🌐 URL Fetcher (SSRF Vulnerability)</h1>
+    <h1>📁 File Download</h1>
     
     <div class="card">
-        <h2>Fetch External URL</h2>
-        <p>This tool fetches content from any URL. Try it out!</p>
+        <h2>Download Files</h2>
+        <p>Download files from the server. Try accessing different files!</p>
         
-        <form method="GET" class="fetch-form">
+        <div class="file-list">
+            <h3>Available Files:</h3>
+            <ul>
+                <li><a href="?file=public.txt">public.txt</a> - Public file</li>
+                <li><a href="?file=data.txt">data.txt</a> - Data file</li>
+            </ul>
+        </div>
+        
+        <form method="GET">
             <div class="form-group">
-                <label>URL to fetch:</label>
-                <input type="text" name="url" value="{{ url }}" placeholder="https://example.com" required>
-                <button type="submit" class="btn">Fetch</button>
+                <label for="file">File Path:</label>
+                <input type="text" id="file" name="file" value="{{ filename }}" placeholder="Enter filename">
             </div>
+            <button type="submit" class="btn">Download</button>
         </form>
         
         {% if error %}
@@ -25,8 +33,8 @@
         {% endif %}
         
         {% if content %}
-        <div class="content-box">
-            <h3>Fetched Content:</h3>
+        <div class="file-content">
+            <h3>File Content:</h3>
             <pre>{{ content }}</pre>
         </div>
         {% endif %}
@@ -34,20 +42,13 @@
         {% if flag %}
         <div class="flag-box">
             <h3>🏁 Flag Found!</h3>
-            <p>You successfully exploited SSRF to access internal resources!</p>
             <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
-            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+            <p>You successfully exploited the path traversal vulnerability!</p>
         </div>
         {% endif %}
         
         <div class="hint">
-            <p><strong>Hint:</strong> This is vulnerable to <strong>Server-Side Request Forgery (SSRF)</strong>!</p>
-            <p>Try accessing internal resources:</p>
-            <ul>
-                <li><code>http://localhost:5000/admin</code></li>
-                <li><code>http://127.0.0.1:5000/.env</code></li>
-                <li><code>file:///etc/passwd</code> (on Linux systems)</li>
-            </ul>
+            <p><strong>Hint:</strong> Try using path traversal sequences like <code>../</code> or try accessing <code>secret.txt</code> directly!</p>
         </div>
     </div>
     
@@ -55,18 +56,43 @@
 </div>
 
 <style>
-.fetch-form .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+.file-list {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
 }
 
-.fetch-form label {
+.file-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.file-list li {
+    padding: 0.5rem 0;
+}
+
+.file-list a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.file-list a:hover {
+    text-decoration: underline;
+}
+
+.form-group {
+    margin: 1rem 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
     font-weight: bold;
 }
 
-.fetch-form input {
+.form-group input {
+    width: 100%;
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -82,16 +108,14 @@
     margin: 1rem 0;
 }
 
-.content-box {
+.file-content {
     background-color: #f8f9fa;
     padding: 1rem;
     border-radius: 4px;
     margin: 1rem 0;
-    max-height: 400px;
-    overflow-y: auto;
 }
 
-.content-box pre {
+.file-content pre {
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -122,11 +146,6 @@
     padding: 1rem;
     border-radius: 4px;
     margin-top: 1rem;
-}
-
-.hint ul {
-    margin: 0.5rem 0;
-    padding-left: 1.5rem;
 }
 
 .hint code {

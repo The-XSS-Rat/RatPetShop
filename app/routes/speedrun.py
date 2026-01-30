@@ -183,7 +183,7 @@ def submit_speedrun_flag():
         }), 400
     
     # Validate flag
-    is_correct = submitted_value == flag.value
+    is_correct = submitted_value == flag.secret.value if flag.secret else False
     
     # Create submission
     submission = Submission(

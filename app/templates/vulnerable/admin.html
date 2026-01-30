@@ -18,7 +18,7 @@
         {% if flag %}
         <div class="flag-box">
             <h3>🏁 Flag Found!</h3>
-            <code>{{ flag.value }}</code>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
             <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
         </div>
         {% endif %}
@@ -27,7 +27,7 @@
             <h3>System Statistics</h3>
             <ul>
                 <li>Total Users: 1</li>
-                <li>Total Challenges: 13</li>
+                <li>Total Challenges: 18</li>
                 <li>Server Status: Online</li>
             </ul>
         </div>

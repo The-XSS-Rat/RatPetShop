@@ -1,5 +1,5 @@
 """Database initialization and seeding utilities."""
-from app.models import db, User, Flag
+from app.models import db, User, Flag, FlagSecret
 import secrets
 
 
@@ -148,18 +148,87 @@ def seed_flags():
             'vulnerability_type': 'A10_SSRF',
             'description': 'Exploit SSRF to access internal resources. Visit <a href="/fetch-url">/fetch-url</a> and try fetching internal URLs.',
             'hint': None
+        },
+        
+        # A04:2021 – Insecure Design (Medium)
+        {
+            'name': 'Insecure Design - Medium',
+            'value': f'FLAG{{insecure_design_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A04_Insecure_Design',
+            'description': 'Exploit a business logic flaw in the password reset functionality. Visit <a href="/reset-password">/reset-password</a> and find the vulnerability.',
+            'hint': None
+        },
+        
+        # A06:2021 – Vulnerable and Outdated Components (Easy)
+        {
+            'name': 'Outdated Components - Easy',
+            'value': f'FLAG{{outdated_components_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A06_Vulnerable_Components',
+            'description': 'Find information about vulnerable dependencies. Visit <a href="/dependencies">/dependencies</a> to see the application\'s dependencies and identify vulnerable versions.',
+            'hint': 'Look for outdated package versions with known vulnerabilities'
+        },
+        
+        # A09:2021 – Security Logging and Monitoring Failures (Medium)
+        {
+            'name': 'Logging Failures - Medium',
+            'value': f'FLAG{{logging_failures_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A09_Logging_Monitoring_Failures',
+            'description': 'Exploit insufficient logging to hide your tracks. Visit <a href="/sensitive-action">/sensitive-action</a> and perform actions that are not properly logged.',
+            'hint': None
+        },
+        
+        # Additional XSS challenge (A03:2021 - Injection variant)
+        {
+            'name': 'XSS - Medium',
+            'value': f'FLAG{{xss_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Find and exploit a Cross-Site Scripting (XSS) vulnerability. Visit <a href="/comment">/comment</a> and inject JavaScript to steal the flag from the page.',
+            'hint': 'Try injecting script tags in the comment field'
+        },
+        
+        # Additional Path Traversal challenge (A01:2021 variant)
+        {
+            'name': 'Path Traversal - Hard',
+            'value': f'FLAG{{path_traversal_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Exploit a path traversal vulnerability to read sensitive files. Visit <a href="/download">/download</a> and try to access files outside the intended directory.',
+            'hint': None
         }
     ]
     
     for flag_data in flags_data:
+        flag_value = flag_data.pop('value')  # Remove value from flag_data
+        
         existing = Flag.query.filter_by(name=flag_data['name']).first()
         if not existing:
             flag = Flag(**flag_data)
             db.session.add(flag)
+            db.session.flush()  # Get the flag ID
+            
+            # Create the secret entry
+            secret = FlagSecret(flag_id=flag.id, value=flag_value)
+            db.session.add(secret)
         else:
             # Update existing flags with new descriptions
             existing.description = flag_data['description']
             existing.hint = flag_data['hint']
+            
+            # Update or create secret
+            if not existing.secret:
+                secret = FlagSecret(flag_id=existing.id, value=flag_value)
+                db.session.add(secret)
+            else:
+                existing.secret.value = flag_value
     
     db.session.commit()
     print(f"Seeded {len(flags_data)} flags successfully!")

@@ -40,7 +40,6 @@ class Flag(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    value = db.Column(db.String(255), nullable=False, unique=True)
     points = db.Column(db.Integer, default=100)
     difficulty = db.Column(db.String(20), nullable=False)  # easy, medium, hard
     vulnerability_type = db.Column(db.String(50), nullable=False)  # OWASP Top 10 type
@@ -50,9 +49,22 @@ class Flag(db.Model):
     
     # Relationships
     submissions = db.relationship('Submission', backref='flag', lazy=True, cascade='all, delete-orphan')
+    secret = db.relationship('FlagSecret', backref='flag', uselist=False, lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<Flag {self.name} ({self.difficulty})>'
+
+
+class FlagSecret(db.Model):
+    """Separate table for flag values to prevent easy SQLi extraction of all flags."""
+    __tablename__ = 'flag_secrets'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    flag_id = db.Column(db.Integer, db.ForeignKey('flags.id'), nullable=False, unique=True)
+    value = db.Column(db.String(255), nullable=False, unique=True)
+    
+    def __repr__(self):
+        return f'<FlagSecret flag_id={self.flag_id}>'
 
 
 class Submission(db.Model):

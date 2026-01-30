@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Sensitive Actions - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>⚠️ Sensitive Administrative Actions</h1>
+    
+    <div class="card">
+        <h2>Perform Administrative Action</h2>
+        <p>This page allows you to perform sensitive actions. Notice anything missing?</p>
+        
+        {% if action_performed and flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>You discovered that sensitive actions are not being logged!</p>
+            <p>In a real application, this would allow attackers to operate without detection.</p>
+        </div>
+        {% else %}
+        <form method="POST">
+            <div class="form-group">
+                <label for="action">Select Action:</label>
+                <select id="action" name="action" required>
+                    <option value="">-- Select --</option>
+                    <option value="view_logs">View Logs</option>
+                    <option value="delete_all_data">Delete All Data</option>
+                    <option value="modify_settings">Modify Settings</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Perform Action</button>
+        </form>
+        
+        <div class="hint">
+            <p><strong>Hint:</strong> Try performing a dangerous action like "Delete All Data" and notice there's no logging mechanism in place!</p>
+        </div>
+        {% endif %}
+        
+        <div class="warning">
+            <p><strong>Security Issue:</strong> This application does not properly log sensitive actions.</p>
+            <p>Without adequate logging and monitoring:</p>
+            <ul>
+                <li>Attackers can operate undetected</li>
+                <li>Security incidents cannot be investigated</li>
+                <li>Compliance requirements are not met</li>
+                <li>Forensic analysis is impossible</li>
+            </ul>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn btn-secondary">Back to Challenges</a>
+</div>
+
+<style>
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+
+.hint {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.warning {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.warning ul {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+.form-group {
+    margin: 1rem 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{% endblock %}

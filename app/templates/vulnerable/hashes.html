@@ -38,7 +38,7 @@
         {% if flag %}
         <div class="flag-box">
             <h3>🏁 Flag (Visible when you understand the vulnerability)</h3>
-            <code>{{ flag.value }}</code>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
             <p>Submit this flag to earn {{ flag.points }} points!</p>
         </div>
         {% endif %}

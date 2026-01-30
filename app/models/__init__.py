@@ -1,4 +1,4 @@
 """Initialize models package."""
-from app.models.models import db, User, Flag, Submission, SpeedrunSession
+from app.models.models import db, User, Flag, FlagSecret, Submission, SpeedrunSession
 
-__all__ = ['db', 'User', 'Flag', 'Submission', 'SpeedrunSession']
+__all__ = ['db', 'User', 'Flag', 'FlagSecret', 'Submission', 'SpeedrunSession']
