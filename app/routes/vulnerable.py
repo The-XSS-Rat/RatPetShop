@@ -374,10 +374,7 @@ def sensitive_action():
 @vulnerable_bp.route('/comment', methods=['GET', 'POST'])
 def comment():
     """VULNERABLE: Stored XSS in comments."""
-    try:
-        from markupsafe import Markup
-    except ImportError:
-        from flask import Markup
+    from markupsafe import Markup
     
     flag = Flag.query.filter_by(name='XSS - Medium').first()
     
@@ -418,11 +415,15 @@ def download():
         file_path = os.path.join('data', filename)
         
         # For demo purposes, simulate file system
-        if '../' in filename or filename == 'secret.txt':
+        if '../' in filename:
+            # User is attempting path traversal
             flag = Flag.query.filter_by(name='Path Traversal - Hard').first()
-            content = "This is a secret file!\n\nYou successfully exploited path traversal!"
+            content = "This is a secret file accessed via path traversal!\n\nYou successfully exploited path traversal!"
         elif filename == 'public.txt':
             content = "This is a public file that anyone can access."
+        elif filename == 'secret.txt':
+            # Secret file should only be accessible via path traversal (e.g., ../data/secret.txt)
+            content = "This file exists but you need to use path traversal to access it properly."
         else:
             error = "File not found"
     
