@@ -5,6 +5,7 @@ import sqlite3
 import os
 import hashlib
 import urllib.request
+import urllib.parse
 
 vulnerable_bp = Blueprint('vulnerable', __name__)
 
@@ -287,21 +288,13 @@ def fetch_url():
     
     if url:
         try:
-            # SECURITY FIX: Block file:// protocol to prevent local file access
-            # This prevents reading sensitive files like /etc/shadow while still
-            # allowing the SSRF challenge to work with http/https protocols
-            if url.lower().startswith('file://'):
-                error = "Access denied: file:// protocol is not allowed for security reasons"
-                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+            # SECURITY FIX: Use proper URL parsing and whitelist only http/https protocols
+            # This prevents reading sensitive files like /etc/shadow via file:// protocol
+            # while still allowing the SSRF challenge to work with http/https protocols
+            parsed_url = urllib.parse.urlparse(url)
             
-            # Also block other dangerous protocols
-            dangerous_protocols = ['ftp://', 'gopher://', 'data://', 'dict://', 'sftp://']
-            if any(url.lower().startswith(proto) for proto in dangerous_protocols):
-                error = "Access denied: this protocol is not allowed"
-                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
-            
-            # Only allow http and https protocols
-            if not (url.lower().startswith('http://') or url.lower().startswith('https://')):
+            # Only allow http and https schemes (case-insensitive)
+            if parsed_url.scheme.lower() not in ['http', 'https']:
                 error = "Access denied: only http:// and https:// protocols are allowed"
                 return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
             
