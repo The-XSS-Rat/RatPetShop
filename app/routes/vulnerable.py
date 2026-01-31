@@ -293,18 +293,26 @@ def fetch_url():
             # while still allowing the SSRF challenge to work with http/https protocols
             parsed_url = urllib.parse.urlparse(url)
             
+            # Ensure a scheme is present (reject relative URLs and empty schemes)
+            if not parsed_url.scheme:
+                error = "Access denied: invalid URL format"
+                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+            
             # Only allow http and https schemes (case-insensitive)
             if parsed_url.scheme.lower() not in ['http', 'https']:
                 error = "Access denied: only http:// and https:// protocols are allowed"
                 return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
             
+            # Reconstruct URL from parsed components to prevent parsing inconsistencies
+            validated_url = parsed_url.geturl()
+            
             # Vulnerable - still allows SSRF to internal HTTP services for the CTF challenge!
             # WARNING: SSRF vulnerability - allows access to internal HTTP resources
-            with urllib.request.urlopen(url, timeout=5) as response:
+            with urllib.request.urlopen(validated_url, timeout=5) as response:
                 content = response.read().decode('utf-8')[:1000]  # Limit output
                 
                 # If accessing localhost/internal, show flag
-                if 'localhost' in url.lower() or '127.0.0.1' in url:
+                if 'localhost' in validated_url.lower() or '127.0.0.1' in validated_url:
                     flag = Flag.query.filter_by(name='SSRF - Hard').first()
         
         except Exception as e:
