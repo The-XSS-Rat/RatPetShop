@@ -172,7 +172,9 @@ This document contains solutions to all challenges. Try solving them yourself fi
 3. The server fetches the internal admin page
 4. The flag is displayed after accessing localhost
 
-**Learning**: Always validate and sanitize URLs. Implement allow-lists for external resources.
+**Security Note**: The `file://` protocol has been blocked to prevent local file system access (e.g., reading `/etc/shadow`). The challenge still demonstrates SSRF by allowing access to internal HTTP services.
+
+**Learning**: Always validate and sanitize URLs. Implement allow-lists for external resources. Block dangerous protocols like `file://`, `gopher://`, `ftp://`, etc.
 
 ---
 
