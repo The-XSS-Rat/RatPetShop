@@ -278,7 +278,7 @@ def session_check():
 # Challenge 13: SSRF - Hard
 @vulnerable_bp.route('/fetch-url')
 def fetch_url():
-    """VULNERABLE: SSRF vulnerability."""
+    """VULNERABLE: SSRF vulnerability (but protected against file:// protocol)."""
     url = request.args.get('url', '')
     
     flag = None
@@ -287,8 +287,26 @@ def fetch_url():
     
     if url:
         try:
-            # Vulnerable - no URL validation!
-            # WARNING: SSRF vulnerability - allows access to internal resources
+            # SECURITY FIX: Block file:// protocol to prevent local file access
+            # This prevents reading sensitive files like /etc/shadow while still
+            # allowing the SSRF challenge to work with http/https protocols
+            if url.lower().startswith('file://'):
+                error = "Access denied: file:// protocol is not allowed for security reasons"
+                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+            
+            # Also block other dangerous protocols
+            dangerous_protocols = ['ftp://', 'gopher://', 'data://', 'dict://', 'sftp://']
+            if any(url.lower().startswith(proto) for proto in dangerous_protocols):
+                error = "Access denied: this protocol is not allowed"
+                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+            
+            # Only allow http and https protocols
+            if not (url.lower().startswith('http://') or url.lower().startswith('https://')):
+                error = "Access denied: only http:// and https:// protocols are allowed"
+                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+            
+            # Vulnerable - still allows SSRF to internal HTTP services for the CTF challenge!
+            # WARNING: SSRF vulnerability - allows access to internal HTTP resources
             with urllib.request.urlopen(url, timeout=5) as response:
                 content = response.read().decode('utf-8')[:1000]  # Limit output
                 

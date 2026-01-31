@@ -157,7 +157,17 @@ This application is **intentionally vulnerable** for educational purposes. It in
 - Broken access control
 - Weak authentication mechanisms
 - Information disclosure
+- SSRF (Server-Side Request Forgery) - **Limited to HTTP/HTTPS only**
 - And more...
+
+### Important Security Note
+
+While this application contains intentional vulnerabilities for learning purposes, certain protections have been implemented to prevent actual server compromise:
+
+- **File Protocol Blocked**: The SSRF vulnerability does NOT support `file://` protocol access to prevent reading sensitive system files like `/etc/shadow`, `/etc/passwd`, or bash history files.
+- **Protocol Whitelist**: Only `http://` and `https://` protocols are allowed in URL fetching endpoints.
+
+These protections ensure the application remains a safe learning tool while still demonstrating real security concepts.
 
 **Never use this application's code patterns in real applications!**
 
