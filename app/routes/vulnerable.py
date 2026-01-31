@@ -303,8 +303,22 @@ def fetch_url():
                 error = "Access denied: only http:// and https:// protocols are allowed"
                 return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
             
+            # Ensure netloc (hostname) is present to prevent malformed URLs
+            if not parsed_url.netloc:
+                error = "Access denied: invalid URL format (missing hostname)"
+                return render_template('vulnerable/ssrf.html', url=url, content=content, error=error, flag=flag)
+            
             # Reconstruct URL from parsed components to prevent parsing inconsistencies
             validated_url = parsed_url.geturl()
+            
+            # NOTE: This endpoint is intentionally vulnerable to SSRF for educational purposes.
+            # It allows access to localhost and private IPs (like 127.0.0.1, 2130706433, etc.)
+            # to demonstrate SSRF attacks. In a real application, you would also need to:
+            # - Block private IP ranges (RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+            # - Block loopback addresses (127.0.0.0/8, ::1)
+            # - Validate hostnames resolve to public IPs only
+            # - Block cloud metadata endpoints (169.254.169.254)
+            # However, these protections are omitted here to allow the CTF challenge to work.
             
             # Vulnerable - still allows SSRF to internal HTTP services for the CTF challenge!
             # WARNING: SSRF vulnerability - allows access to internal HTTP resources
