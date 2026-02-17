@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Template Renderer - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📝 Template Renderer</h1>
+    
+    <div class="card">
+        <h2>Render Custom Template</h2>
+        <p>Enter a template to render (supports Jinja2 syntax):</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="template">Template:</label>
+                <textarea id="template" name="template" rows="8" placeholder="Hello {{ name }}!" required></textarea>
+            </div>
+            <button type="submit" class="btn">Render</button>
+        </form>
+        
+        {% if output %}
+        <div class="output-box">
+            <h3>Rendered Output:</h3>
+            <div>{{ output|safe }}</div>
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+textarea {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.output-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

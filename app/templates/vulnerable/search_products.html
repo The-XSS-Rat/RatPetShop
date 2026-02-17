@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Product Search - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔎 Product Search</h1>
+    
+    <div class="card">
+        <h2>Search Products</h2>
+        
+        <form method="GET">
+            <div class="form-group">
+                <label for="q">Search Query:</label>
+                <input type="text" id="q" name="q" placeholder="Search for products..." value="{{ query }}">
+            </div>
+            <button type="submit" class="btn">Search</button>
+        </form>
+        
+        {% if query %}
+        <div class="results-section">
+            <h3>Search Results for: {{ query|safe }}</h3>
+            
+            {% if products %}
+            <div class="products-list">
+                {% for product in products %}
+                <div class="product-item">
+                    <h4>{{ product.name }}</h4>
+                    <p>{{ product.description }}</p>
+                    <p><strong>Price:</strong> ${{ product.price }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No products found.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+.results-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #eee;
+}
+
+.products-list {
+    margin-top: 1rem;
+}
+
+.product-item {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.product-item h4 {
+    margin-top: 0;
+    color: #333;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

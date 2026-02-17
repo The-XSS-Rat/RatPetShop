@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}OTP Verification - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔢 OTP Verification</h1>
+    
+    <div class="card">
+        <h2>Verify OTP Code</h2>
+        <p>Enter the 6-digit OTP code sent to your device:</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="otp">OTP Code:</label>
+                <input type="text" id="otp" name="otp" placeholder="123456" maxlength="6" pattern="[0-9]{6}" required>
+            </div>
+            <button type="submit" class="btn">Verify</button>
+        </form>
+        
+        {% if success %}
+        <div class="alert-success">
+            <p><strong>Success!</strong> OTP verified successfully.</p>
+        </div>
+        {% endif %}
+        
+        {% if attempts %}
+        <div class="info-box">
+            <p><small>Attempts remaining: {{ attempts }}</small></p>
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+input[type="text"]#otp {
+    font-family: monospace;
+    font-size: 1.2em;
+    letter-spacing: 0.3em;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.info-box {
+    background-color: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

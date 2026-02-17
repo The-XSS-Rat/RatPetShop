@@ -203,6 +203,304 @@ def seed_flags():
             'vulnerability_type': 'A01_Broken_Access_Control',
             'description': 'Exploit a path traversal vulnerability to read sensitive files. Visit <a href="/download">/download</a> and try to access files outside the intended directory.',
             'hint': None
+        },
+        
+        # NEW CHALLENGES - 30 additional challenges
+        
+        # Command Injection challenges
+        {
+            'name': 'Command Injection - Easy',
+            'value': f'FLAG{{cmd_injection_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Execute system commands through user input. Visit <a href="/ping">/ping</a> and try injecting commands.',
+            'hint': 'Try using ; or && to chain commands. Example: 127.0.0.1; ls'
+        },
+        {
+            'name': 'Command Injection - Medium',
+            'value': f'FLAG{{cmd_injection_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Bypass basic command injection filters. Visit <a href="/nslookup">/nslookup</a> and find a way around the filters.',
+            'hint': None
+        },
+        {
+            'name': 'Command Injection - Hard',
+            'value': f'FLAG{{cmd_injection_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Advanced command injection with strict filtering. Visit <a href="/whois">/whois</a> and exploit the vulnerability.',
+            'hint': None
+        },
+        
+        # XXE challenges
+        {
+            'name': 'XXE - Easy',
+            'value': f'FLAG{{xxe_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A05_Security_Misconfiguration',
+            'description': 'Exploit XML External Entity vulnerability. Visit <a href="/xml-parser">/xml-parser</a> and inject malicious XML.',
+            'hint': 'Use DOCTYPE to define an external entity that reads a file or makes a request'
+        },
+        {
+            'name': 'XXE - Medium',
+            'value': f'FLAG{{xxe_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A05_Security_Misconfiguration',
+            'description': 'Advanced XXE with limited output. Visit <a href="/xml-validator">/xml-validator</a> to find the flag.',
+            'hint': None
+        },
+        
+        # Template Injection challenges
+        {
+            'name': 'Template Injection - Easy',
+            'value': f'FLAG{{ssti_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Exploit Server-Side Template Injection. Visit <a href="/greet">/greet</a> and inject template code.',
+            'hint': 'Try {{7*7}} to test for template injection'
+        },
+        {
+            'name': 'Template Injection - Medium',
+            'value': f'FLAG{{ssti_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Advanced SSTI to extract sensitive data. Visit <a href="/render-template">/render-template</a> and exploit it.',
+            'hint': None
+        },
+        
+        # Open Redirect challenges
+        {
+            'name': 'Open Redirect - Easy',
+            'value': f'FLAG{{redirect_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Find and exploit an open redirect vulnerability. Visit <a href="/redirect">/redirect</a> and manipulate the redirect parameter.',
+            'hint': 'Look for URL parameters like ?next= or ?url='
+        },
+        {
+            'name': 'Open Redirect - Medium',
+            'value': f'FLAG{{redirect_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Bypass open redirect filters. Visit <a href="/safe-redirect">/safe-redirect</a> and find a bypass.',
+            'hint': None
+        },
+        
+        # CSRF challenges
+        {
+            'name': 'CSRF - Easy',
+            'value': f'FLAG{{csrf_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Exploit missing CSRF protection. Visit <a href="/change-email">/change-email</a> to find the vulnerability.',
+            'hint': 'This endpoint accepts POST requests without CSRF tokens'
+        },
+        {
+            'name': 'CSRF - Medium',
+            'value': f'FLAG{{csrf_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Bypass weak CSRF protection. Visit <a href="/transfer-funds">/transfer-funds</a> and exploit it.',
+            'hint': None
+        },
+        
+        # NoSQL Injection challenges
+        {
+            'name': 'NoSQL Injection - Easy',
+            'value': f'FLAG{{nosql_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Exploit NoSQL injection vulnerability. Visit <a href="/mongo-search">/mongo-search</a> and inject NoSQL operators.',
+            'hint': 'Try using MongoDB operators like $ne, $gt in JSON'
+        },
+        {
+            'name': 'NoSQL Injection - Medium',
+            'value': f'FLAG{{nosql_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Advanced NoSQL injection. Visit <a href="/mongo-login">/mongo-login</a> to bypass authentication.',
+            'hint': None
+        },
+        
+        # Business Logic challenges
+        {
+            'name': 'Business Logic - Easy',
+            'value': f'FLAG{{logic_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A04_Insecure_Design',
+            'description': 'Exploit a business logic flaw in the coupon system. Visit <a href="/apply-coupon">/apply-coupon</a>.',
+            'hint': 'Try applying the same coupon multiple times'
+        },
+        {
+            'name': 'Business Logic - Medium',
+            'value': f'FLAG{{logic_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A04_Insecure_Design',
+            'description': 'Find a race condition in the order system. Visit <a href="/place-order">/place-order</a>.',
+            'hint': None
+        },
+        {
+            'name': 'Business Logic - Hard',
+            'value': f'FLAG{{logic_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A04_Insecure_Design',
+            'description': 'Exploit complex business logic in the refund system. Visit <a href="/request-refund">/request-refund</a>.',
+            'hint': None
+        },
+        
+        # Information Disclosure challenges
+        {
+            'name': 'Info Disclosure - Easy',
+            'value': f'FLAG{{info_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A02_Cryptographic_Failures',
+            'description': 'Find sensitive information in HTTP headers. Visit <a href="/api/info">/api/info</a> and examine the response.',
+            'hint': 'Check HTTP response headers for sensitive data'
+        },
+        {
+            'name': 'Info Disclosure - Medium',
+            'value': f'FLAG{{info_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A02_Cryptographic_Failures',
+            'description': 'Extract data from debug endpoints. Visit <a href="/debug/vars">/debug/vars</a> to find the flag.',
+            'hint': None
+        },
+        {
+            'name': 'Info Disclosure - Hard',
+            'value': f'FLAG{{info_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A02_Cryptographic_Failures',
+            'description': 'Find hidden API endpoints through enumeration. Start at <a href="/api/v1">/api/v1</a>.',
+            'hint': None
+        },
+        
+        # JWT challenges
+        {
+            'name': 'JWT - Easy',
+            'value': f'FLAG{{jwt_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A07_Authentication_Failures',
+            'description': 'Exploit weak JWT signature. Visit <a href="/jwt-login">/jwt-login</a> and manipulate the token.',
+            'hint': 'Try changing the algorithm to "none" or modifying the payload'
+        },
+        {
+            'name': 'JWT - Medium',
+            'value': f'FLAG{{jwt_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A07_Authentication_Failures',
+            'description': 'Crack a weak JWT secret. Visit <a href="/jwt-protected">/jwt-protected</a> with a valid token.',
+            'hint': None
+        },
+        {
+            'name': 'JWT - Hard',
+            'value': f'FLAG{{jwt_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A07_Authentication_Failures',
+            'description': 'Exploit JWT key confusion attack. Visit <a href="/jwt-admin">/jwt-admin</a>.',
+            'hint': None
+        },
+        
+        # File Upload challenges
+        {
+            'name': 'File Upload - Easy',
+            'value': f'FLAG{{upload_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Bypass file type restrictions. Visit <a href="/upload">/upload</a> and upload a restricted file.',
+            'hint': 'Try changing the file extension or MIME type'
+        },
+        {
+            'name': 'File Upload - Medium',
+            'value': f'FLAG{{upload_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A01_Broken_Access_Control',
+            'description': 'Upload a file to overwrite existing files. Visit <a href="/upload-image">/upload-image</a>.',
+            'hint': None
+        },
+        
+        # Rate Limiting challenges
+        {
+            'name': 'Rate Limiting - Easy',
+            'value': f'FLAG{{rate_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A07_Authentication_Failures',
+            'description': 'Exploit missing rate limiting to brute force. Visit <a href="/otp-verify">/otp-verify</a>.',
+            'hint': 'There is no rate limiting on OTP attempts'
+        },
+        {
+            'name': 'Rate Limiting - Medium',
+            'value': f'FLAG{{rate_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A07_Authentication_Failures',
+            'description': 'Bypass client-side rate limiting. Visit <a href="/api-calls">/api-calls</a>.',
+            'hint': None
+        },
+        
+        # Deserialization challenges
+        {
+            'name': 'Deserialization - Medium',
+            'value': f'FLAG{{deser_medium_{secrets.token_hex(8)}}}',
+            'points': 200,
+            'difficulty': 'medium',
+            'vulnerability_type': 'A08_Software_Data_Integrity_Failures',
+            'description': 'Exploit insecure deserialization. Visit <a href="/load-profile">/load-profile</a>.',
+            'hint': None
+        },
+        {
+            'name': 'Deserialization - Hard',
+            'value': f'FLAG{{deser_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A08_Software_Data_Integrity_Failures',
+            'description': 'Chain deserialization with code execution. Visit <a href="/import-data">/import-data</a>.',
+            'hint': None
+        },
+        
+        # Additional XSS variants
+        {
+            'name': 'XSS - Easy',
+            'value': f'FLAG{{xss_easy_{secrets.token_hex(8)}}}',
+            'points': 100,
+            'difficulty': 'easy',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Find a reflected XSS vulnerability. Visit <a href="/search-products">/search-products</a> and inject JavaScript.',
+            'hint': 'Try <script>alert(1)</script> in the search parameter'
+        },
+        {
+            'name': 'DOM XSS - Hard',
+            'value': f'FLAG{{dom_xss_hard_{secrets.token_hex(8)}}}',
+            'points': 300,
+            'difficulty': 'hard',
+            'vulnerability_type': 'A03_Injection',
+            'description': 'Exploit DOM-based XSS. Visit <a href="/client-render">/client-render</a> and find the vulnerability.',
+            'hint': None
         }
     ]
     
