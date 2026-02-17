@@ -590,6 +590,7 @@ def xml_validator():
     valid = None
     error = None
     flag = None
+    result = None
     
     if request.method == 'POST':
         xml_data = request.form.get('xml', '')
@@ -599,6 +600,7 @@ def xml_validator():
                 parser = ET.XMLParser()
                 root = ET.fromstring(xml_data, parser=parser)
                 valid = True
+                result = "XML is valid"
                 
                 # Flag shown for advanced XXE
                 if 'ENTITY' in xml_data.upper() and 'SYSTEM' in xml_data.upper():
@@ -606,8 +608,9 @@ def xml_validator():
             except Exception as e:
                 error = "Invalid XML"
                 valid = False
+                result = "XML validation failed"
     
-    return render_template('vulnerable/xml_validator.html', valid=valid, error=error, flag=flag)
+    return render_template('vulnerable/xml_validator.html', valid=valid, error=error, flag=flag, result=result)
 
 
 # Challenge 24-25: Template Injection
@@ -699,6 +702,7 @@ def change_email():
     """VULNERABLE: Missing CSRF protection."""
     success = None
     flag = None
+    current_email = "user@example.com"
     
     if request.method == 'POST':
         new_email = request.form.get('email', '')
@@ -706,7 +710,7 @@ def change_email():
             success = True
             flag = Flag.query.filter_by(name='CSRF - Easy').first()
     
-    return render_template('vulnerable/change_email.html', success=success, flag=flag)
+    return render_template('vulnerable/change_email.html', success=success, flag=flag, current_email=current_email)
 
 
 @vulnerable_bp.route('/transfer-funds', methods=['GET', 'POST'])
@@ -714,6 +718,7 @@ def transfer_funds():
     """VULNERABLE: Weak CSRF protection."""
     success = None
     flag = None
+    balance = 1000
     
     if request.method == 'POST':
         # Weak CSRF check
@@ -724,7 +729,7 @@ def transfer_funds():
             success = True
             flag = Flag.query.filter_by(name='CSRF - Medium').first()
     
-    return render_template('vulnerable/transfer_funds.html', success=success, flag=flag, token='weak_token')
+    return render_template('vulnerable/transfer_funds.html', success=success, flag=flag, token='weak_token', balance=balance)
 
 
 # Challenge 30-31: NoSQL Injection (simulated)
@@ -805,6 +810,7 @@ def place_order():
     """VULNERABLE: Race condition in inventory check."""
     success = None
     flag = None
+    order = None
     
     if request.method == 'POST':
         item_id = request.form.get('item_id', '')
@@ -814,8 +820,9 @@ def place_order():
         if quantity > 10:  # Impossible order size
             success = True
             flag = Flag.query.filter_by(name='Business Logic - Medium').first()
+            order = {'id': '12345', 'quantity': quantity, 'total': quantity * 19.99}
     
-    return render_template('vulnerable/place_order.html', success=success, flag=flag)
+    return render_template('vulnerable/place_order.html', success=success, flag=flag, order=order)
 
 
 @vulnerable_bp.route('/request-refund', methods=['GET', 'POST'])
@@ -823,6 +830,7 @@ def request_refund():
     """VULNERABLE: Multiple refunds for same order."""
     success = None
     flag = None
+    refund = None
     
     if request.method == 'POST':
         order_id = request.form.get('order_id', '')
@@ -832,8 +840,9 @@ def request_refund():
         if refund_count > 1:
             success = True
             flag = Flag.query.filter_by(name='Business Logic - Hard').first()
+            refund = {'amount': 29.99 * refund_count, 'count': refund_count}
     
-    return render_template('vulnerable/request_refund.html', success=success, flag=flag)
+    return render_template('vulnerable/request_refund.html', success=success, flag=flag, refund=refund)
 
 
 # Challenge 35-37: Information Disclosure
@@ -859,14 +868,30 @@ def debug_vars():
     """VULNERABLE: Debug endpoint exposing variables."""
     flag = Flag.query.filter_by(name='Info Disclosure - Medium').first()
     
-    debug_info = {
+    config = {
         'app_mode': 'debug',
         'database': 'ratpetshop.db',
-        'secret_key': 'dev-secret-key-change-in-production',
-        'flag': flag.secret.value if (flag and flag.secret) else 'ERROR'
+        'secret_key': 'dev-secret-key-change-in-production'
     }
     
-    return render_template('vulnerable/debug_vars.html', debug_info=debug_info)
+    env_vars = {
+        'PATH': '/usr/bin:/bin',
+        'FLAG': flag.secret.value if (flag and flag.secret) else 'ERROR'
+    }
+    
+    request_info = {
+        'method': 'GET',
+        'path': '/debug/vars',
+        'user_agent': 'Mozilla/5.0'
+    }
+    
+    debug_info = config  # For backwards compatibility
+    
+    return render_template('vulnerable/debug_vars.html', 
+                         debug_info=debug_info,
+                         config=config, 
+                         env_vars=env_vars, 
+                         request_info=request_info)
 
 
 @vulnerable_bp.route('/api/v1')
@@ -930,6 +955,7 @@ def jwt_protected():
     """VULNERABLE: JWT with weak secret."""
     flag = None
     error = None
+    data = None
     
     if request.method == 'POST':
         token = request.form.get('token', '')
@@ -939,10 +965,11 @@ def jwt_protected():
             import jwt as pyjwt
             decoded = pyjwt.decode(token, 'secret', algorithms=['HS256'])
             flag = Flag.query.filter_by(name='JWT - Medium').first()
+            data = decoded
         except:
             error = "Invalid token"
     
-    return render_template('vulnerable/jwt_protected.html', flag=flag, error=error)
+    return render_template('vulnerable/jwt_protected.html', flag=flag, error=error, data=data)
 
 
 @vulnerable_bp.route('/jwt-admin', methods=['GET', 'POST'])
@@ -950,6 +977,7 @@ def jwt_admin():
     """VULNERABLE: JWT key confusion."""
     flag = None
     error = None
+    admin_data = None
     
     if request.method == 'POST':
         token = request.form.get('token', '')
@@ -961,10 +989,11 @@ def jwt_admin():
             decoded = pyjwt.decode(token, options={"verify_signature": False})
             if decoded.get('admin') == True:
                 flag = Flag.query.filter_by(name='JWT - Hard').first()
+                admin_data = {'username': decoded.get('username', 'admin'), 'role': 'administrator'}
         except Exception as e:
             error = str(e)
     
-    return render_template('vulnerable/jwt_admin.html', flag=flag, error=error)
+    return render_template('vulnerable/jwt_admin.html', flag=flag, error=error, admin_data=admin_data)
 
 
 # Challenge 41-42: File Upload
@@ -973,6 +1002,8 @@ def upload():
     """VULNERABLE: File upload with weak validation."""
     success = None
     flag = None
+    filename = None
+    filepath = None
     
     if request.method == 'POST':
         file = request.files.get('file')
@@ -982,8 +1013,9 @@ def upload():
             if not filename.endswith('.txt'):
                 success = True
                 flag = Flag.query.filter_by(name='File Upload - Easy').first()
+                filepath = f'/uploads/{filename}'
     
-    return render_template('vulnerable/upload.html', success=success, flag=flag)
+    return render_template('vulnerable/upload.html', success=success, flag=flag, filename=filename, filepath=filepath)
 
 
 @vulnerable_bp.route('/upload-image', methods=['GET', 'POST'])
@@ -991,6 +1023,9 @@ def upload_image():
     """VULNERABLE: Path traversal in upload."""
     success = None
     flag = None
+    filename = None
+    filepath = None
+    url = None
     
     if request.method == 'POST':
         file = request.files.get('file')
@@ -1001,8 +1036,10 @@ def upload_image():
             if '../' in filename:
                 success = True
                 flag = Flag.query.filter_by(name='File Upload - Medium').first()
+                filepath = f'/uploads/{filename}'
+                url = f'/view/{filename}'
     
-    return render_template('vulnerable/upload_image.html', success=success, flag=flag)
+    return render_template('vulnerable/upload_image.html', success=success, flag=flag, filename=filename, filepath=filepath, url=url)
 
 
 # Challenge 43-44: Rate Limiting
@@ -1011,16 +1048,18 @@ def otp_verify():
     """VULNERABLE: No rate limiting on OTP."""
     success = None
     flag = None
+    attempts = 0
     
     if request.method == 'POST':
         otp = request.form.get('otp', '')
+        attempts = int(request.form.get('attempts', 0)) + 1
         
         # Correct OTP is 1234
         if otp == '1234':
             success = True
             flag = Flag.query.filter_by(name='Rate Limiting - Easy').first()
     
-    return render_template('vulnerable/otp_verify.html', success=success, flag=flag)
+    return render_template('vulnerable/otp_verify.html', success=success, flag=flag, attempts=attempts)
 
 
 @vulnerable_bp.route('/api-calls', methods=['GET', 'POST'])
@@ -1028,15 +1067,19 @@ def api_calls():
     """VULNERABLE: Client-side rate limiting."""
     success = None
     flag = None
+    result = None
+    remaining = 10
     
     if request.method == 'POST':
         # Client-side check is in JS - easily bypassed
         calls = int(request.form.get('calls', 0))
+        remaining = max(0, 10 - calls)
         if calls > 10:
             success = True
             flag = Flag.query.filter_by(name='Rate Limiting - Medium').first()
+            result = f'Successfully made {calls} API calls!'
     
-    return render_template('vulnerable/api_calls.html', success=success, flag=flag)
+    return render_template('vulnerable/api_calls.html', success=success, flag=flag, result=result, remaining=remaining)
 
 
 # Challenge 45-46: Deserialization
@@ -1102,10 +1145,18 @@ def search_products():
     # VULNERABLE: No escaping
     search_result = Markup(f"You searched for: {query}")
     
+    # Simulate product results
+    products = [
+        {'name': 'Rat Food Premium', 'price': 19.99},
+        {'name': 'Rat Cage Deluxe', 'price': 89.99},
+        {'name': 'Rat Toy Set', 'price': 14.99}
+    ]
+    
     return render_template('vulnerable/search_products.html', 
                          search_result=search_result, 
                          query=query,
-                         flag=flag)
+                         flag=flag,
+                         products=products)
 
 
 # Challenge 48: DOM XSS - Hard
