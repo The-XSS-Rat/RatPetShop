@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}API Calls - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📡 API Call Counter</h1>
+    
+    <div class="card">
+        <h2>Make API Call</h2>
+        <p>Make an API request (rate limited):</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="calls">Number of Calls:</label>
+                <input type="number" id="calls" name="calls" value="1" min="1" max="10" required>
+            </div>
+            <button type="submit" class="btn">Make API Call</button>
+        </form>
+        
+        {% if result %}
+        <div class="result-box">
+            <h3>Result:</h3>
+            <pre>{{ result }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if remaining %}
+        <div class="info-box">
+            <p>API calls remaining: <strong>{{ remaining }}</strong></p>
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+.result-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.result-box pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.info-box {
+    background-color: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

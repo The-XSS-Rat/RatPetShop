@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Safe Redirect - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>✅ Safe Redirect Service</h1>
+    
+    <div class="card">
+        <h2>Redirecting...</h2>
+        <p>You will be redirected to: <strong>{{ url }}</strong></p>
+        <p>If you are not redirected automatically, <a href="{{ url }}">click here</a>.</p>
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+
+{% block extra_js %}
+<script>
+    setTimeout(function() {
+        window.location.href = "{{ url }}";
+    }, 3000);
+</script>
+{% endblock %}
+{% endblock %}

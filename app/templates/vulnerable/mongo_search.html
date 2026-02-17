@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}MongoDB Search - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔍 Product Search (MongoDB)</h1>
+    
+    <div class="card">
+        <h2>Search Products</h2>
+        <p>Enter a MongoDB query (JSON format):</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="query">Query:</label>
+                <textarea id="query" name="query" rows="5" placeholder='{"name": "Rat Food"}' required></textarea>
+            </div>
+            <button type="submit" class="btn">Search</button>
+        </form>
+        
+        {% if results %}
+        <div class="results-box">
+            <h3>Search Results:</h3>
+            <pre>{{ results }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+textarea {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.results-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.results-box pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

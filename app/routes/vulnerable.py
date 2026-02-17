@@ -468,3 +468,700 @@ def download():
                          content=content, 
                          error=error, 
                          flag=flag)
+
+
+# ============= NEW CHALLENGES (30 additional) =============
+
+# Challenge 19-21: Command Injection
+@vulnerable_bp.route('/ping', methods=['GET', 'POST'])
+def ping():
+    """VULNERABLE: Command injection in ping utility."""
+    output = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        host = request.form.get('host', '')
+        if host:
+            try:
+                import subprocess
+                # VULNERABLE: Direct command execution with user input
+                result = subprocess.run(f'ping -c 1 {host}', shell=True, capture_output=True, text=True, timeout=5)
+                output = result.stdout + result.stderr
+                
+                # If command injection detected, show flag
+                if ';' in host or '&&' in host or '|' in host:
+                    flag = Flag.query.filter_by(name='Command Injection - Easy').first()
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/ping.html', output=output, error=error, flag=flag)
+
+
+@vulnerable_bp.route('/nslookup', methods=['GET', 'POST'])
+def nslookup():
+    """VULNERABLE: Command injection with basic filtering."""
+    output = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        domain = request.form.get('domain', '')
+        if domain:
+            # Basic filter - can be bypassed
+            if ';' in domain or '&&' in domain:
+                error = "Invalid characters detected"
+            else:
+                try:
+                    import subprocess
+                    # Still vulnerable to other injection methods
+                    result = subprocess.run(f'nslookup {domain}', shell=True, capture_output=True, text=True, timeout=5)
+                    output = result.stdout + result.stderr
+                    
+                    if '|' in domain or '`' in domain or '$(' in domain:
+                        flag = Flag.query.filter_by(name='Command Injection - Medium').first()
+                except Exception as e:
+                    error = str(e)
+    
+    return render_template('vulnerable/nslookup.html', output=output, error=error, flag=flag)
+
+
+@vulnerable_bp.route('/whois', methods=['GET', 'POST'])
+def whois():
+    """VULNERABLE: Advanced command injection with strict filtering."""
+    output = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        domain = request.form.get('domain', '')
+        if domain:
+            # Strict filter - harder to bypass
+            blacklist = [';', '&&', '|', '`', '$', '>', '<', '\n', '\r']
+            if any(char in domain for char in blacklist):
+                error = "Invalid characters detected"
+            else:
+                try:
+                    import subprocess
+                    # Still vulnerable with creative payloads
+                    result = subprocess.run(f'echo {domain}', shell=True, capture_output=True, text=True, timeout=5)
+                    output = result.stdout + result.stderr
+                    
+                    # If they got creative enough, show flag
+                    if len(output) > 100 or 'FLAG' in output:
+                        flag = Flag.query.filter_by(name='Command Injection - Hard').first()
+                except Exception as e:
+                    error = str(e)
+    
+    return render_template('vulnerable/whois.html', output=output, error=error, flag=flag)
+
+
+# Challenge 22-23: XXE
+@vulnerable_bp.route('/xml-parser', methods=['GET', 'POST'])
+def xml_parser():
+    """VULNERABLE: XML External Entity injection."""
+    result = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        xml_data = request.form.get('xml', '')
+        if xml_data:
+            try:
+                import xml.etree.ElementTree as ET
+                # VULNERABLE: External entities enabled
+                parser = ET.XMLParser()
+                root = ET.fromstring(xml_data, parser=parser)
+                result = f"Parsed XML: {root.tag}"
+                
+                # If XXE payload detected, show flag
+                if 'ENTITY' in xml_data.upper():
+                    flag = Flag.query.filter_by(name='XXE - Easy').first()
+                    result += f"\n\nFlag: {flag.secret.value if (flag and flag.secret) else 'ERROR'}"
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/xml_parser.html', result=result, error=error, flag=flag)
+
+
+@vulnerable_bp.route('/xml-validator', methods=['GET', 'POST'])
+def xml_validator():
+    """VULNERABLE: XXE with limited output."""
+    valid = None
+    error = None
+    flag = None
+    result = None
+    
+    if request.method == 'POST':
+        xml_data = request.form.get('xml', '')
+        if xml_data:
+            try:
+                import xml.etree.ElementTree as ET
+                parser = ET.XMLParser()
+                root = ET.fromstring(xml_data, parser=parser)
+                valid = True
+                result = "XML is valid"
+                
+                # Flag shown for advanced XXE
+                if 'ENTITY' in xml_data.upper() and 'SYSTEM' in xml_data.upper():
+                    flag = Flag.query.filter_by(name='XXE - Medium').first()
+            except Exception as e:
+                error = "Invalid XML"
+                valid = False
+                result = "XML validation failed"
+    
+    return render_template('vulnerable/xml_validator.html', valid=valid, error=error, flag=flag, result=result)
+
+
+# Challenge 24-25: Template Injection
+@vulnerable_bp.route('/greet', methods=['GET', 'POST'])
+def greet():
+    """VULNERABLE: Server-Side Template Injection."""
+    from flask import render_template_string
+    
+    output = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        name = request.form.get('name', '')
+        if name:
+            try:
+                # VULNERABLE: Template injection
+                template = f"Hello {name}!"
+                output = render_template_string(template)
+                
+                # If template injection detected
+                if '{{' in name or '{%' in name:
+                    flag = Flag.query.filter_by(name='Template Injection - Easy').first()
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/greet.html', output=output, error=error, flag=flag)
+
+
+@vulnerable_bp.route('/render-template', methods=['GET', 'POST'])
+def render_template_vuln():
+    """VULNERABLE: Advanced SSTI."""
+    from flask import render_template_string
+    
+    output = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        template = request.form.get('template', '')
+        if template:
+            try:
+                # VULNERABLE: Direct template rendering
+                output = render_template_string(template)
+                
+                # If advanced SSTI used
+                if 'config' in template or '__' in template:
+                    flag = Flag.query.filter_by(name='Template Injection - Medium').first()
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/render_template.html', output=output, error=error, flag=flag)
+
+
+# Challenge 26-27: Open Redirect
+@vulnerable_bp.route('/redirect')
+def open_redirect():
+    """VULNERABLE: Open redirect vulnerability."""
+    url = request.args.get('url', '')
+    
+    if url:
+        # VULNERABLE: No validation
+        flag = Flag.query.filter_by(name='Open Redirect - Easy').first()
+        return render_template('vulnerable/redirect.html', url=url, flag=flag)
+    
+    return render_template('vulnerable/redirect.html', url=None, flag=None)
+
+
+@vulnerable_bp.route('/safe-redirect')
+def safe_redirect():
+    """VULNERABLE: Open redirect with weak filtering."""
+    url = request.args.get('url', '')
+    flag = None
+    
+    if url:
+        # Weak filter - can be bypassed
+        if not url.startswith('http://'):
+            # Bypass: use https:// or // or other protocols
+            flag = Flag.query.filter_by(name='Open Redirect - Medium').first()
+        
+        return render_template('vulnerable/safe_redirect.html', url=url, flag=flag)
+    
+    return render_template('vulnerable/safe_redirect.html', url=None, flag=None)
+
+
+# Challenge 28-29: CSRF
+@vulnerable_bp.route('/change-email', methods=['GET', 'POST'])
+def change_email():
+    """VULNERABLE: Missing CSRF protection."""
+    success = None
+    flag = None
+    current_email = "user@example.com"
+    
+    if request.method == 'POST':
+        new_email = request.form.get('email', '')
+        if new_email:
+            success = True
+            flag = Flag.query.filter_by(name='CSRF - Easy').first()
+    
+    return render_template('vulnerable/change_email.html', success=success, flag=flag, current_email=current_email)
+
+
+@vulnerable_bp.route('/transfer-funds', methods=['GET', 'POST'])
+def transfer_funds():
+    """VULNERABLE: Weak CSRF protection."""
+    success = None
+    flag = None
+    balance = 1000
+    
+    if request.method == 'POST':
+        # Weak CSRF check
+        token = request.form.get('csrf_token', '')
+        if token == 'weak_token':  # Predictable token
+            amount = request.form.get('amount', '')
+            to_user = request.form.get('to_user', '')
+            success = True
+            flag = Flag.query.filter_by(name='CSRF - Medium').first()
+    
+    return render_template('vulnerable/transfer_funds.html', success=success, flag=flag, token='weak_token', balance=balance)
+
+
+# Challenge 30-31: NoSQL Injection (simulated)
+@vulnerable_bp.route('/mongo-search', methods=['GET', 'POST'])
+def mongo_search():
+    """VULNERABLE: NoSQL injection simulation."""
+    import json
+    
+    results = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        query = request.form.get('query', '')
+        if query:
+            try:
+                # Simulate NoSQL injection
+                query_obj = json.loads(query)
+                if '$ne' in str(query_obj) or '$gt' in str(query_obj):
+                    flag = Flag.query.filter_by(name='NoSQL Injection - Easy').first()
+                    results = "Query executed successfully (injection detected)"
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/mongo_search.html', results=results, error=error, flag=flag)
+
+
+@vulnerable_bp.route('/mongo-login', methods=['GET', 'POST'])
+def mongo_login():
+    """VULNERABLE: NoSQL injection in authentication."""
+    import json
+    
+    success = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        
+        try:
+            # Simulate NoSQL authentication bypass
+            if '{' in username or '{' in password:
+                user_obj = json.loads(username) if '{' in username else username
+                pass_obj = json.loads(password) if '{' in password else password
+                
+                if isinstance(user_obj, dict) or isinstance(pass_obj, dict):
+                    success = True
+                    flag = Flag.query.filter_by(name='NoSQL Injection - Medium').first()
+        except Exception as e:
+            error = str(e)
+    
+    return render_template('vulnerable/mongo_login.html', success=success, error=error, flag=flag)
+
+
+# Challenge 32-34: Business Logic
+@vulnerable_bp.route('/apply-coupon', methods=['GET', 'POST'])
+def apply_coupon():
+    """VULNERABLE: Coupon can be applied multiple times."""
+    discount = 0
+    flag = None
+    
+    if request.method == 'POST':
+        coupon = request.form.get('coupon', '')
+        times = int(request.form.get('times', 1))
+        
+        if coupon == 'SAVE10':
+            # VULNERABLE: No check for multiple applications
+            discount = 10 * times
+            if times > 1:
+                flag = Flag.query.filter_by(name='Business Logic - Easy').first()
+    
+    return render_template('vulnerable/apply_coupon.html', discount=discount, flag=flag)
+
+
+@vulnerable_bp.route('/place-order', methods=['GET', 'POST'])
+def place_order():
+    """VULNERABLE: Race condition in inventory check."""
+    success = None
+    flag = None
+    order = None
+    
+    if request.method == 'POST':
+        item_id = request.form.get('item_id', '')
+        quantity = int(request.form.get('quantity', 1))
+        
+        # Simulate race condition vulnerability
+        if quantity > 10:  # Impossible order size
+            success = True
+            flag = Flag.query.filter_by(name='Business Logic - Medium').first()
+            order = {'id': '12345', 'quantity': quantity, 'total': quantity * 19.99}
+    
+    return render_template('vulnerable/place_order.html', success=success, flag=flag, order=order)
+
+
+@vulnerable_bp.route('/request-refund', methods=['GET', 'POST'])
+def request_refund():
+    """VULNERABLE: Multiple refunds for same order."""
+    success = None
+    flag = None
+    refund = None
+    
+    if request.method == 'POST':
+        order_id = request.form.get('order_id', '')
+        refund_count = int(request.form.get('refund_count', 1))
+        
+        # VULNERABLE: Can request multiple refunds
+        if refund_count > 1:
+            success = True
+            flag = Flag.query.filter_by(name='Business Logic - Hard').first()
+            refund = {'amount': 29.99 * refund_count, 'count': refund_count}
+    
+    return render_template('vulnerable/request_refund.html', success=success, flag=flag, refund=refund)
+
+
+# Challenge 35-37: Information Disclosure
+@vulnerable_bp.route('/api/info')
+def api_info():
+    """VULNERABLE: Sensitive info in headers."""
+    flag = Flag.query.filter_by(name='Info Disclosure - Easy').first()
+    
+    response = {
+        'status': 'ok',
+        'version': '1.0.0'
+    }
+    
+    from flask import jsonify, make_response
+    resp = make_response(jsonify(response))
+    resp.headers['X-Debug-Token'] = 'debug-123456'
+    resp.headers['X-Flag'] = flag.secret.value if (flag and flag.secret) else 'ERROR'
+    return resp
+
+
+@vulnerable_bp.route('/debug/vars')
+def debug_vars():
+    """VULNERABLE: Debug endpoint exposing variables."""
+    flag = Flag.query.filter_by(name='Info Disclosure - Medium').first()
+    
+    config = {
+        'app_mode': 'debug',
+        'database': 'ratpetshop.db',
+        'secret_key': 'dev-secret-key-change-in-production'
+    }
+    
+    env_vars = {
+        'PATH': '/usr/bin:/bin',
+        'FLAG': flag.secret.value if (flag and flag.secret) else 'ERROR'
+    }
+    
+    request_info = {
+        'method': 'GET',
+        'path': '/debug/vars',
+        'user_agent': 'Mozilla/5.0'
+    }
+    
+    debug_info = config  # For backwards compatibility
+    
+    return render_template('vulnerable/debug_vars.html', 
+                         debug_info=debug_info,
+                         config=config, 
+                         env_vars=env_vars, 
+                         request_info=request_info)
+
+
+@vulnerable_bp.route('/api/v1')
+def api_v1():
+    """VULNERABLE: API enumeration starting point."""
+    from flask import jsonify
+    
+    endpoints = [
+        '/api/v1/users',
+        '/api/v1/admin',
+        '/api/v1/secret',
+        '/api/v1/config'
+    ]
+    
+    return jsonify({'endpoints': endpoints})
+
+
+@vulnerable_bp.route('/api/v1/secret')
+def api_secret():
+    """VULNERABLE: Hidden endpoint with flag."""
+    flag = Flag.query.filter_by(name='Info Disclosure - Hard').first()
+    from flask import jsonify
+    
+    return jsonify({
+        'flag': flag.secret.value if (flag and flag.secret) else 'ERROR',
+        'message': 'You found the secret endpoint!'
+    })
+
+
+# Challenge 38-40: JWT
+@vulnerable_bp.route('/jwt-login', methods=['GET', 'POST'])
+def jwt_login():
+    """VULNERABLE: Weak JWT implementation."""
+    token = None
+    flag = None
+    
+    if request.method == 'POST':
+        username = request.form.get('username', '')
+        
+        # Create weak JWT (base64 encoded, no signature)
+        import base64
+        import json
+        
+        payload = {'username': username, 'admin': False}
+        token = base64.b64encode(json.dumps(payload).encode()).decode()
+        
+        # Check if token was manipulated
+        if request.form.get('token'):
+            try:
+                decoded = json.loads(base64.b64decode(request.form.get('token')))
+                if decoded.get('admin') == True:
+                    flag = Flag.query.filter_by(name='JWT - Easy').first()
+            except:
+                pass
+    
+    return render_template('vulnerable/jwt_login.html', token=token, flag=flag)
+
+
+@vulnerable_bp.route('/jwt-protected', methods=['GET', 'POST'])
+def jwt_protected():
+    """VULNERABLE: JWT with weak secret."""
+    flag = None
+    error = None
+    data = None
+    
+    if request.method == 'POST':
+        token = request.form.get('token', '')
+        
+        # Weak secret: "secret"
+        try:
+            import jwt as pyjwt
+            decoded = pyjwt.decode(token, 'secret', algorithms=['HS256'])
+            flag = Flag.query.filter_by(name='JWT - Medium').first()
+            data = decoded
+        except:
+            error = "Invalid token"
+    
+    return render_template('vulnerable/jwt_protected.html', flag=flag, error=error, data=data)
+
+
+@vulnerable_bp.route('/jwt-admin', methods=['GET', 'POST'])
+def jwt_admin():
+    """VULNERABLE: JWT key confusion."""
+    flag = None
+    error = None
+    admin_data = None
+    
+    if request.method == 'POST':
+        token = request.form.get('token', '')
+        
+        # Vulnerable to algorithm confusion attack
+        try:
+            import jwt as pyjwt
+            # Accept multiple algorithms
+            decoded = pyjwt.decode(token, options={"verify_signature": False})
+            if decoded.get('admin') == True:
+                flag = Flag.query.filter_by(name='JWT - Hard').first()
+                admin_data = {'username': decoded.get('username', 'admin'), 'role': 'administrator'}
+        except Exception as e:
+            error = str(e)
+    
+    return render_template('vulnerable/jwt_admin.html', flag=flag, error=error, admin_data=admin_data)
+
+
+# Challenge 41-42: File Upload
+@vulnerable_bp.route('/upload', methods=['GET', 'POST'])
+def upload():
+    """VULNERABLE: File upload with weak validation."""
+    success = None
+    flag = None
+    filename = None
+    filepath = None
+    
+    if request.method == 'POST':
+        file = request.files.get('file')
+        if file:
+            filename = file.filename
+            # Weak extension check
+            if not filename.endswith('.txt'):
+                success = True
+                flag = Flag.query.filter_by(name='File Upload - Easy').first()
+                filepath = f'/uploads/{filename}'
+    
+    return render_template('vulnerable/upload.html', success=success, flag=flag, filename=filename, filepath=filepath)
+
+
+@vulnerable_bp.route('/upload-image', methods=['GET', 'POST'])
+def upload_image():
+    """VULNERABLE: Path traversal in upload."""
+    success = None
+    flag = None
+    filename = None
+    filepath = None
+    url = None
+    
+    if request.method == 'POST':
+        file = request.files.get('file')
+        filename = request.form.get('filename', '')
+        
+        if file and filename:
+            # VULNERABLE: No path sanitization
+            if '../' in filename:
+                success = True
+                flag = Flag.query.filter_by(name='File Upload - Medium').first()
+                filepath = f'/uploads/{filename}'
+                url = f'/view/{filename}'
+    
+    return render_template('vulnerable/upload_image.html', success=success, flag=flag, filename=filename, filepath=filepath, url=url)
+
+
+# Challenge 43-44: Rate Limiting
+@vulnerable_bp.route('/otp-verify', methods=['GET', 'POST'])
+def otp_verify():
+    """VULNERABLE: No rate limiting on OTP."""
+    success = None
+    flag = None
+    attempts = 0
+    
+    if request.method == 'POST':
+        otp = request.form.get('otp', '')
+        attempts = int(request.form.get('attempts', 0)) + 1
+        
+        # Correct OTP is 1234
+        if otp == '1234':
+            success = True
+            flag = Flag.query.filter_by(name='Rate Limiting - Easy').first()
+    
+    return render_template('vulnerable/otp_verify.html', success=success, flag=flag, attempts=attempts)
+
+
+@vulnerable_bp.route('/api-calls', methods=['GET', 'POST'])
+def api_calls():
+    """VULNERABLE: Client-side rate limiting."""
+    success = None
+    flag = None
+    result = None
+    remaining = 10
+    
+    if request.method == 'POST':
+        # Client-side check is in JS - easily bypassed
+        calls = int(request.form.get('calls', 0))
+        remaining = max(0, 10 - calls)
+        if calls > 10:
+            success = True
+            flag = Flag.query.filter_by(name='Rate Limiting - Medium').first()
+            result = f'Successfully made {calls} API calls!'
+    
+    return render_template('vulnerable/api_calls.html', success=success, flag=flag, result=result, remaining=remaining)
+
+
+# Challenge 45-46: Deserialization
+@vulnerable_bp.route('/load-profile', methods=['GET', 'POST'])
+def load_profile():
+    """VULNERABLE: Insecure deserialization."""
+    import pickle
+    import base64
+    
+    result = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        data = request.form.get('data', '')
+        if data:
+            try:
+                # VULNERABLE: Unpickle user data
+                decoded = base64.b64decode(data)
+                obj = pickle.loads(decoded)
+                result = str(obj)
+                flag = Flag.query.filter_by(name='Deserialization - Medium').first()
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/load_profile.html', result=result, error=error, flag=flag)
+
+
+@vulnerable_bp.route('/import-data', methods=['GET', 'POST'])
+def import_data():
+    """VULNERABLE: Advanced deserialization."""
+    import pickle
+    import base64
+    
+    result = None
+    error = None
+    flag = None
+    
+    if request.method == 'POST':
+        data = request.form.get('data', '')
+        if data:
+            try:
+                # VULNERABLE: Unpickle without validation
+                decoded = base64.b64decode(data)
+                obj = pickle.loads(decoded)
+                result = "Data imported successfully"
+                flag = Flag.query.filter_by(name='Deserialization - Hard').first()
+            except Exception as e:
+                error = str(e)
+    
+    return render_template('vulnerable/import_data.html', result=result, error=error, flag=flag)
+
+
+# Challenge 47: XSS - Easy (Reflected)
+@vulnerable_bp.route('/search-products')
+def search_products():
+    """VULNERABLE: Reflected XSS."""
+    from markupsafe import Markup
+    
+    query = request.args.get('q', '')
+    flag = Flag.query.filter_by(name='XSS - Easy').first()
+    
+    # VULNERABLE: No escaping
+    search_result = Markup(f"You searched for: {query}")
+    
+    # Simulate product results
+    products = [
+        {'name': 'Rat Food Premium', 'price': 19.99},
+        {'name': 'Rat Cage Deluxe', 'price': 89.99},
+        {'name': 'Rat Toy Set', 'price': 14.99}
+    ]
+    
+    return render_template('vulnerable/search_products.html', 
+                         search_result=search_result, 
+                         query=query,
+                         flag=flag,
+                         products=products)
+
+
+# Challenge 48: DOM XSS - Hard
+@vulnerable_bp.route('/client-render')
+def client_render():
+    """VULNERABLE: DOM-based XSS."""
+    flag = Flag.query.filter_by(name='DOM XSS - Hard').first()
+    return render_template('vulnerable/client_render.html', flag=flag)

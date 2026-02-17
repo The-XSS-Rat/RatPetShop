@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}JWT Login - RatPetShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔑 JWT Login</h1>
+    
+    <div class="card">
+        <h2>User Login</h2>
+        <p>Login to receive a JWT token:</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="username" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        
+        {% if token %}
+        <div class="token-box">
+            <h3>Your JWT Token:</h3>
+            <code>{{ token }}</code>
+            <p><small>Use this token to access protected resources</small></p>
+        </div>
+        {% endif %}
+        
+        {% if flag %}
+        <div class="flag-box">
+            <h3>🏁 Flag Found!</h3>
+            <code>{{ flag.secret.value if flag.secret else 'ERROR' }}</code>
+            <p>Copy this flag and submit it in the challenge page to earn {{ flag.points }} points!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a href="{{ url_for('challenges.index') }}" class="btn">Back to Challenges</a>
+</div>
+
+<style>
+.token-box {
+    background-color: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.token-box code {
+    background-color: #fff;
+    padding: 0.5rem;
+    border-radius: 3px;
+    display: block;
+    margin: 0.5rem 0;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.85em;
+}
+
+.flag-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.flag-box code {
+    background-color: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+</style>
+{% endblock %}
